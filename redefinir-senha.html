@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redefinir senha — RicServ</title>
+<link rel="stylesheet" href="ricserv-styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Google AdSense: depois de ter sua conta aprovada, remova os comentarios e coloque seu ID de editor -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4472840466327433" crossorigin="anonymous"></script>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF4405">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a href="/index.html" class="brand">Ric<span>Serv</span></a>
+  </div>
+
+  <section style="padding-top:4px;">
+    <h1 style="font-size:22px; margin-bottom:20px;">Criar nova senha</h1>
+
+    <div id="msgBox"></div>
+
+    <form id="formNovaSenha">
+      <div class="field">
+        <label for="novaSenha">Nova senha</label>
+        <input type="password" id="novaSenha" minlength="6" required>
+      </div>
+      <div class="field">
+        <label for="confirmarSenha">Confirme a nova senha</label>
+        <input type="password" id="confirmarSenha" minlength="6" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="btnSalvar">Salvar nova senha</button>
+    </form>
+  </section>
+
+  <footer>
+    Grupo Riccieri - 2026
+  </footer>
+
+</div>
+
+<script src="config.js"></script>
+<script>
+  function mostraMsg(texto, tipo) {
+    document.getElementById('msgBox').innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
+  }
+
+  // O Supabase, ao seguir o link do e-mail, já estabelece uma sessão temporária de recuperação
+  sb.auth.onAuthStateChange((event) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      mostraMsg('Digite sua nova senha abaixo.', 'ok');
+    }
+  });
+
+  document.getElementById('formNovaSenha').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('btnSalvar');
+    const novaSenha = document.getElementById('novaSenha').value;
+    const confirmarSenha = document.getElementById('confirmarSenha').value;
+
+    if (novaSenha !== confirmarSenha) {
+      mostraMsg('As senhas não coincidem.', 'error');
+      return;
+    }
+    if (novaSenha.length < 6) {
+      mostraMsg('A senha precisa ter pelo menos 6 caracteres.', 'error');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Salvando...';
+
+    const { error } = await sb.auth.updateUser({ password: novaSenha });
+
+    if (error) {
+      mostraMsg('Não foi possível salvar a nova senha. O link pode ter expirado — solicite um novo em "Esqueci minha senha".', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Salvar nova senha';
+      return;
+    }
+
+    mostraMsg('Senha alterada com sucesso! Redirecionando para o login...', 'ok');
+    setTimeout(() => { window.location.href = '/login.html'; }, 1800);
+  });
+</script>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+  }
+</script>
+</body>
+</html>

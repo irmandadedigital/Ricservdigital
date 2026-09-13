@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meu painel — RicServ</title>
+<link rel="stylesheet" href="ricserv-styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Google AdSense: depois de ter sua conta aprovada, remova os comentarios e coloque seu ID de editor -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4472840466327433" crossorigin="anonymous"></script>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF4405">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a href="/index.html" class="brand">Ric<span>Serv</span></a>
+    <button class="btn btn-ghost" id="btnSair">Sair</button>
+  </div>
+
+  <section style="padding-top:0;">
+    <div id="saudacao" style="margin-bottom:16px;">
+      <h1 style="font-size:20px;">Carregando...</h1>
+    </div>
+
+    <div id="msgBox"></div>
+
+    <!-- ===== Visão do CLIENTE ===== -->
+    <div id="painelCliente" style="display:none;">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">Novo pedido de serviço</div>
+        <form id="formPedido">
+          <div class="field">
+            <label for="titulo">O que você precisa? (título curto)</label>
+            <input type="text" id="titulo" placeholder="Ex: Instalar chuveiro elétrico" required>
+          </div>
+          <div class="field">
+            <label for="descricao">Detalhes</label>
+            <textarea id="descricao" placeholder="Descreva o serviço, urgência, etc." required></textarea>
+          </div>
+          <div class="field">
+            <label for="cidade">Cidade</label>
+            <input type="text" id="cidade" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Publicar pedido</button>
+        </form>
+      </div>
+
+      <h2 style="font-size:16px; margin: 24px 0 12px;">Meus pedidos</h2>
+      <div id="listaMeusPedidos"></div>
+    </div>
+
+    <!-- ===== Visão do PROFISSIONAL ===== -->
+    <div id="painelProfissional" style="display:none;">
+      <div class="card" style="display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <div class="card-meta" style="margin-bottom:2px;">Seu saldo</div>
+          <div class="card-title" id="saldoMoedas" style="font-size:20px;">— moedas</div>
+        </div>
+        <a href="/comprar-moedas.html" class="btn btn-primary">Comprar moedas</a>
+      </div>
+
+      <h2 style="font-size:16px; margin:20px 0 12px;">Pedidos em aberto</h2>
+      <p style="font-size:12px; color:var(--muted); margin:-6px 0 14px;">Liberar o contato de um cliente custa 5 moedas.</p>
+      <div id="listaPedidosAbertos"></div>
+    </div>
+  </section>
+
+  <div class="ad-slot">[ Espaço reservado para anúncio — Painel ]</div>
+
+  <footer>
+    Grupo Riccieri - 2026
+  </footer>
+
+</div>
+
+<script src="config.js"></script>
+<script>
+  let perfilAtual = null;
+
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      window.location.href = '/login.html';
+      return;
+    }
+
+    const { data: perfil, error } = await sb
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+
+    if (error || !perfil) {
+      mostraMsg('Não foi possível carregar seu perfil. Tente sair e entrar novamente.', 'error');
+      return;
+    }
+
+    perfilAtual = perfil;
+    document.getElementById('saudacao').innerHTML = `<h1 style="font-size:20px;">Olá, ${perfil.nome.split(' ')[0]}</h1>`;
+
+    if (perfil.role === 'cliente') {
+      document.getElementById('painelCliente').style.display = 'block';
+      preencherPedidoDaBusca();
+      carregarMeusPedidos();
+    } else {
+      document.getElementById('painelProfissional').style.display = 'block';
+      document.getElementById('saldoMoedas').textContent = `${perfil.saldo_moedas} moedas`;
+      carregarPedidosAbertos();
+    }
+  }
+
+  function mostraMsg(texto, tipo) {
+    document.getElementById('msgBox').innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
+  }
+
+  // Se veio da busca da home ("Pedir"), já preenche o formulário
+  function preencherPedidoDaBusca() {
+    const params = new URLSearchParams(window.location.search);
+    const texto = params.get('novoPedido');
+    if (texto) {
+      document.getElementById('descricao').value = texto;
+      document.getElementById('titulo').value = texto.slice(0, 60);
+      document.getElementById('cidade').value = perfilAtual.cidade || '';
+    }
+  }
+
+  document.getElementById('formPedido').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const titulo = document.getElementById('titulo').value.trim();
+    const descricao = document.getElementById('descricao').value.trim();
+    const cidade = document.getElementById('cidade').value.trim();
+
+    const { error } = await sb.from('service_requests').insert({
+      client_id: perfilAtual.id,
+      titulo, descricao, cidade
+    });
+
+    if (error) {
+      mostraMsg('Não foi possível publicar o pedido. Tente novamente.', 'error');
+      return;
+    }
+
+    document.getElementById('formPedido').reset();
+    mostraMsg('Pedido publicado! Profissionais da sua região já podem ver.', 'ok');
+    carregarMeusPedidos();
+  });
+
+  async function carregarMeusPedidos() {
+    const { data, error } = await sb
+      .from('service_requests')
+      .select('*')
+      .eq('client_id', perfilAtual.id)
+      .order('created_at', { ascending: false });
+
+    const container = document.getElementById('listaMeusPedidos');
+    if (error) { container.innerHTML = '<div class="empty-state">Erro ao carregar pedidos.</div>'; return; }
+    if (!data.length) { container.innerHTML = '<div class="empty-state">Você ainda não publicou nenhum pedido.</div>'; return; }
+
+    container.innerHTML = data.map(p => `
+      <div class="card">
+        <span class="badge ${p.status !== 'aberto' ? 'warn' : ''}">${p.status}</span>
+        <div class="card-title" style="margin-top:8px;">${escapeHtml(p.titulo)}</div>
+        <div class="card-meta">${escapeHtml(p.cidade || '')} · ${formataData(p.created_at)}</div>
+        <div class="card-desc">${escapeHtml(p.descricao)}</div>
+      </div>
+    `).join('');
+  }
+
+  let contatosLiberadosCache = {};
+
+  async function carregarPedidosAbertos() {
+    const { data, error } = await sb
+      .from('service_requests')
+      .select('*')
+      .eq('status', 'aberto')
+      .order('created_at', { ascending: false });
+
+    const container = document.getElementById('listaPedidosAbertos');
+    if (error) { container.innerHTML = '<div class="empty-state">Erro ao carregar pedidos.</div>'; return; }
+    if (!data.length) { container.innerHTML = '<div class="empty-state">Nenhum pedido em aberto no momento. Volte mais tarde!</div>'; return; }
+
+    // Descobre quais pedidos esse profissional já liberou antes
+    const { data: liberados } = await sb
+      .from('contatos_liberados')
+      .select('request_id')
+      .eq('profissional_id', perfilAtual.id);
+    const idsLiberados = new Set((liberados || []).map(l => l.request_id));
+
+    container.innerHTML = data.map(p => renderCardPedido(p, idsLiberados.has(p.id))).join('');
+
+    // Para os já liberados, busca o contato pra exibir direto (sem cobrar de novo)
+    idsLiberados.forEach(async (id) => {
+      if (data.some(p => p.id === id)) await revelarContato(id, false);
+    });
+
+    document.querySelectorAll('.btn-liberar').forEach(btn => {
+      btn.addEventListener('click', () => revelarContato(btn.dataset.id, true));
+    });
+  }
+
+  function renderCardPedido(p, jaLiberado) {
+    return `
+      <div class="card" id="card-${p.id}">
+        <div class="card-title">${escapeHtml(p.titulo)}</div>
+        <div class="card-meta">${escapeHtml(p.cidade || '')} · ${formataData(p.created_at)}</div>
+        <div class="card-desc">${escapeHtml(p.descricao)}</div>
+        <div id="contato-${p.id}">
+          ${jaLiberado
+            ? '<div style="font-size:13px; color:var(--muted);">Carregando contato...</div>'
+            : `<button class="btn btn-primary btn-liberar" data-id="${p.id}">Liberar contato (5 moedas)</button>`
+          }
+        </div>
+      </div>
+    `;
+  }
+
+  async function revelarContato(requestId, cobrar) {
+    const alvo = document.getElementById(`contato-${requestId}`);
+    if (cobrar && alvo) alvo.innerHTML = '<div style="font-size:13px; color:var(--muted);">Liberando...</div>';
+
+    const { data, error } = await sb.rpc('liberar_contato', { p_request_id: requestId, p_custo: 5 });
+
+    if (error) {
+      if (alvo) alvo.innerHTML = `<div class="msg error" style="margin:0;">${error.message.includes('insuficiente') ? 'Saldo de moedas insuficiente.' : 'Não foi possível liberar o contato.'}</div>`;
+      return;
+    }
+
+    const contato = data[0];
+    if (alvo) {
+      alvo.innerHTML = `<div style="font-size:13px; color:var(--confirm); font-weight:600;">Contato: ${escapeHtml(contato.nome)} — ${escapeHtml(contato.telefone || 'não informado')}</div>`;
+    }
+
+    if (cobrar) {
+      // Atualiza o saldo exibido no topo
+      const { data: perfilAtualizado } = await sb.from('profiles').select('saldo_moedas').eq('id', perfilAtual.id).single();
+      if (perfilAtualizado) {
+        perfilAtual.saldo_moedas = perfilAtualizado.saldo_moedas;
+        document.getElementById('saldoMoedas').textContent = `${perfilAtualizado.saldo_moedas} moedas`;
+      }
+    }
+  }
+
+  function formataData(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  document.getElementById('btnSair').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    window.location.href = '/index.html';
+  });
+
+  init();
+</script>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+  }
+</script>
+</body>
+</html>

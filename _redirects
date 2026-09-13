@@ -1,0 +1,4 @@
+# Equivalente ao redirect do netlify.toml original.
+# Cloudflare Pages já serve arquivos estáticos existentes normalmente;
+# esta regra só entra em ação para caminhos que não batem com nenhum arquivo real.
+/*  /index.html  404

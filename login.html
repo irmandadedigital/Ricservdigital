@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Entrar — RicServ</title>
+<link rel="stylesheet" href="ricserv-styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Google AdSense: depois de ter sua conta aprovada, remova os comentarios e coloque seu ID de editor -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4472840466327433" crossorigin="anonymous"></script>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF4405">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a href="/index.html" class="brand">Ric<span>Serv</span></a>
+  </div>
+
+  <section style="padding-top:4px;">
+    <h1 style="font-size:22px; margin-bottom:20px;">Entrar</h1>
+
+    <div id="msgBox"></div>
+
+    <form id="formLogin">
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" required>
+      </div>
+      <div class="field">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" required>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block" id="btnEntrar">Entrar</button>
+    </form>
+
+    <p style="text-align:center; font-size:14px; margin-top:14px;">
+      <a href="#" id="linkEsqueci" style="color:var(--primary); font-weight:600;">Esqueci minha senha</a>
+    </p>
+
+    <div id="boxEsqueci" style="display:none; margin-top:10px;">
+      <div class="field">
+        <label for="emailRecuperar">Digite seu e-mail de cadastro</label>
+        <input type="email" id="emailRecuperar">
+      </div>
+      <button type="button" class="btn btn-ghost btn-block" id="btnEnviarRecuperacao">Enviar link de redefinição</button>
+    </div>
+
+    <p style="text-align:center; font-size:14px; color:var(--muted); margin-top:18px;">
+      Ainda não tem conta? <a href="/cadastro.html" style="color:var(--primary); font-weight:600;">Cadastre-se</a>
+    </p>
+  </section>
+
+  <footer>
+    Grupo Riccieri - 2026
+  </footer>
+
+</div>
+
+<script src="config.js"></script>
+<script>
+  function mostraMsg(texto, tipo) {
+    document.getElementById('msgBox').innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
+  }
+
+  document.getElementById('formLogin').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('btnEntrar');
+    btn.disabled = true;
+    btn.textContent = 'Entrando...';
+
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
+
+    const { error } = await sb.auth.signInWithPassword({ email, password: senha });
+
+    if (error) {
+      mostraMsg(traduzErroLogin(error.message), 'error');
+      btn.disabled = false;
+      btn.textContent = 'Entrar';
+      return;
+    }
+
+    window.location.href = '/painel.html';
+  });
+
+  function traduzErroLogin(msg) {
+    if (msg.includes('Invalid login credentials')) {
+      return 'E-mail ou senha incorretos.';
+    }
+    if (msg.includes('Email not confirmed')) {
+      return 'Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada (e a pasta de spam) e clique no link de confirmação antes de entrar.';
+    }
+    return 'Não foi possível entrar agora. Tente novamente em instantes.';
+  }
+
+  // ===== Esqueci minha senha =====
+  const linkEsqueci = document.getElementById('linkEsqueci');
+  const boxEsqueci = document.getElementById('boxEsqueci');
+
+  linkEsqueci.addEventListener('click', (e) => {
+    e.preventDefault();
+    const aberto = boxEsqueci.style.display === 'block';
+    boxEsqueci.style.display = aberto ? 'none' : 'block';
+    linkEsqueci.textContent = aberto ? 'Esqueci minha senha' : 'Cancelar';
+  });
+
+  document.getElementById('btnEnviarRecuperacao').addEventListener('click', async () => {
+    const emailRecuperar = document.getElementById('emailRecuperar').value.trim();
+    if (!emailRecuperar) {
+      mostraMsg('Digite seu e-mail para receber o link de redefinição.', 'error');
+      return;
+    }
+
+    const btnEnviar = document.getElementById('btnEnviarRecuperacao');
+    btnEnviar.disabled = true;
+    btnEnviar.textContent = 'Enviando...';
+
+    const { error } = await sb.auth.resetPasswordForEmail(emailRecuperar, {
+      redirectTo: window.location.origin + '/redefinir-senha.html'
+    });
+
+    btnEnviar.disabled = false;
+    btnEnviar.textContent = 'Enviar link de redefinição';
+
+    if (error) {
+      mostraMsg('Não foi possível enviar o e-mail agora. Tente novamente.', 'error');
+      return;
+    }
+
+    mostraMsg('Se esse e-mail estiver cadastrado, enviamos um link para redefinir sua senha.', 'ok');
+    boxEsqueci.style.display = 'none';
+    linkEsqueci.textContent = 'Esqueci minha senha';
+  });
+</script>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+  }
+</script>
+</body>
+</html>

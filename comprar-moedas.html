@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comprar moedas — RicServ</title>
+<link rel="stylesheet" href="ricserv-styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Google AdSense: depois de ter sua conta aprovada, remova os comentarios e coloque seu ID de editor -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4472840466327433" crossorigin="anonymous"></script>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF4405">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a href="/painel.html" class="brand">Ric<span>Serv</span></a>
+  </div>
+
+  <section style="padding-top:0;">
+    <h1 style="font-size:20px; margin-bottom:6px;">Comprar moedas</h1>
+    <p style="color:var(--muted); font-size:14px; margin:0 0 20px; line-height:1.5;">
+      Cada contato liberado custa 10 moedas. Escolha um pacote, faça o pagamento e aguarde a liberação — geralmente em algumas horas.
+    </p>
+
+    <div id="msgBox"></div>
+
+    <div class="field">
+      <label for="pacote">Pacote</label>
+      <select id="pacote">
+        <option value="bronze">Pacote Bronze — 20 moedas (2 contatos) — R$ 20,00</option>
+        <option value="prata">Pacote Prata — 40 moedas (4 contatos) — R$ 35,00</option>
+        <option value="ouro">Pacote Ouro — 80 moedas (8 contatos) — R$ 70,00</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="formaPagamento">Forma de pagamento</label>
+      <select id="formaPagamento">
+        <option value="PIX">Pix</option>
+        <option value="BOLETO">Boleto bancário</option>
+        <option value="CREDIT_CARD">Cartão de crédito</option>
+      </select>
+    </div>
+
+    <div id="camposCartao" style="display:none;">
+      <div class="field">
+        <label for="cartaoNumero">Número do cartão</label>
+        <input type="text" id="cartaoNumero" inputmode="numeric" placeholder="0000 0000 0000 0000" maxlength="19">
+      </div>
+      <div class="field">
+        <label for="cartaoNome">Nome impresso no cartão</label>
+        <input type="text" id="cartaoNome" placeholder="Como está no cartão">
+      </div>
+      <div style="display:flex; gap:10px;">
+        <div class="field" style="flex:1;">
+          <label for="cartaoValidade">Validade (MM/AAAA)</label>
+          <input type="text" id="cartaoValidade" placeholder="12/2030" maxlength="7">
+        </div>
+        <div class="field" style="flex:1;">
+          <label for="cartaoCvv">CVV</label>
+          <input type="text" id="cartaoCvv" inputmode="numeric" placeholder="123" maxlength="4">
+        </div>
+      </div>
+      <div class="field">
+        <label for="cartaoParcelas">Parcelas</label>
+        <select id="cartaoParcelas">
+          <option value="1">1x sem juros</option>
+          <option value="2">2x</option>
+          <option value="3">3x</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn btn-primary btn-block" id="btnSolicitar">Gerar cobrança</button>
+
+    <div class="card" style="margin-top:20px; display:none;" id="cardPix">
+      <div class="card-title">Pague com Pix</div>
+      <p style="font-size:14px; color:var(--muted); margin:8px 0;">Escaneie o QR Code no app do seu banco ou copie o código abaixo:</p>
+      <div id="qrCodeImg" style="text-align:center; margin:12px 0;"></div>
+      <textarea id="qrCodeTexto" readonly style="width:100%; font-size:11px; padding:8px; border:1px solid var(--line); border-radius:8px; background:var(--bg); resize:none;" rows="3"></textarea>
+      <button class="btn btn-block" id="btnCopiarPix" style="margin-top:8px;">Copiar código Pix</button>
+      <button class="btn btn-block" id="btnSimularPagamento" style="margin-top:8px; background:#eee;">🧪 Simular pagamento (só sandbox)</button>
+      <p id="statusPagamento" style="font-size:13px; color:var(--muted); margin-top:12px; text-align:center;">Aguardando confirmação do pagamento…</p>
+    </div>
+
+    <div class="card" style="margin-top:20px; display:none;" id="cardBoleto">
+      <div class="card-title">Pague com Boleto</div>
+      <p style="font-size:14px; color:var(--muted); margin:8px 0;">O boleto pode levar até 2 dias úteis para compensar após o pagamento.</p>
+      <a id="linkBoleto" href="#" target="_blank" class="btn btn-primary btn-block">Abrir / imprimir boleto</a>
+      <p id="statusPagamentoBoleto" style="font-size:13px; color:var(--muted); margin-top:12px; text-align:center;">Aguardando confirmação do pagamento…</p>
+    </div>
+
+    <h2 style="font-size:16px; margin:28px 0 12px;">Minhas solicitações</h2>
+    <div id="listaSolicitacoes"></div>
+  </section>
+
+  <footer>
+    Grupo Riccieri - 2026
+  </footer>
+
+</div>
+
+<script src="https://assets.pagseguro.com.br/checkout-sdk-js/rc/dist/browser/pagseguro.min.js"></script>
+<script src="config.js"></script>
+<script>
+  let perfilAtual = null;
+
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = '/login.html'; return; }
+
+    const { data: perfil } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+    if (!perfil || perfil.role !== 'profissional') {
+      window.location.href = '/painel.html';
+      return;
+    }
+    perfilAtual = perfil;
+    carregarSolicitacoes();
+  }
+
+  function mostraMsg(texto, tipo) {
+    document.getElementById('msgBox').innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
+  }
+
+  document.getElementById('formaPagamento').addEventListener('change', (e) => {
+    document.getElementById('camposCartao').style.display = e.target.value === 'CREDIT_CARD' ? 'block' : 'none';
+  });
+
+  let pollingInterval = null;
+  let solicitacaoAtualId = null;
+
+  // Criptografa o cartão NO NAVEGADOR, usando o SDK do PagBank + a chave
+  // pública buscada na nossa função. O número/CVV do cartão nunca são
+  // enviados em texto puro para o nosso servidor — só o resultado criptografado.
+  async function criptografarCartao() {
+    const numero = document.getElementById('cartaoNumero').value.replace(/\s/g, '');
+    const nome = document.getElementById('cartaoNome').value.trim();
+    const validade = document.getElementById('cartaoValidade').value.trim(); // MM/AAAA
+    const cvv = document.getElementById('cartaoCvv').value.trim();
+
+    const [expMonth, expYear] = validade.split('/');
+    if (!numero || !nome || !expMonth || !expYear || !cvv) {
+      throw new Error('Preencha todos os campos do cartão.');
+    }
+
+    const respChave = await fetch('/api/chave-publica-cartao');
+    const dadosChave = await respChave.json();
+    if (!respChave.ok || !dadosChave.publicKey) {
+      throw new Error('Não foi possível preparar o pagamento com cartão. Tente novamente.');
+    }
+
+    const resultado = PagSeguro.encryptCard({
+      publicKey: dadosChave.publicKey,
+      holder: nome,
+      number: numero,
+      expMonth,
+      expYear,
+      securityCode: cvv,
+    });
+
+    if (resultado.hasErrors) {
+      throw new Error('Dados do cartão inválidos: ' + resultado.errors.map((e) => e.message).join(', '));
+    }
+
+    return resultado.encryptedCard;
+  }
+
+  document.getElementById('btnSolicitar').addEventListener('click', async () => {
+    const pacoteId = document.getElementById('pacote').value;
+    const formaPagamento = document.getElementById('formaPagamento').value;
+    const btn = document.getElementById('btnSolicitar');
+    btn.disabled = true;
+    btn.textContent = 'Gerando cobrança...';
+
+    document.getElementById('cardPix').style.display = 'none';
+    document.getElementById('cardBoleto').style.display = 'none';
+
+    try {
+      let encryptedCard = null;
+      let parcelas = null;
+      if (formaPagamento === 'CREDIT_CARD') {
+        btn.textContent = 'Processando cartão...';
+        encryptedCard = await criptografarCartao();
+        parcelas = document.getElementById('cartaoParcelas').value;
+      }
+
+      const { data: { session } } = await sb.auth.getSession();
+      const resp = await fetch('/api/criar-pedido-pix', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ pacoteId, formaPagamento, encryptedCard, parcelas }),
+      });
+      const dados = await resp.json();
+
+      if (!resp.ok) {
+        mostraMsg(dados.erro || 'Não foi possível gerar a cobrança. Tente novamente.', 'error');
+        return;
+      }
+
+      if (formaPagamento === 'PIX') {
+        document.getElementById('cardPix').style.display = 'block';
+        document.getElementById('qrCodeTexto').value = dados.qrCodeTexto;
+        document.getElementById('qrCodeImg').innerHTML = dados.qrCodeImagemUrl
+          ? `<img src="${dados.qrCodeImagemUrl}" alt="QR Code Pix" style="max-width:220px;">`
+          : '';
+        mostraMsg('QR Code gerado! O pagamento é confirmado automaticamente.', 'ok');
+        iniciarPolling(dados.solicitacaoId);
+      } else if (formaPagamento === 'BOLETO') {
+        document.getElementById('cardBoleto').style.display = 'block';
+        document.getElementById('linkBoleto').href = dados.boletoUrl;
+        mostraMsg('Boleto gerado! O pagamento é confirmado automaticamente após a compensação.', 'ok');
+        iniciarPolling(dados.solicitacaoId);
+      } else if (formaPagamento === 'CREDIT_CARD') {
+        if (dados.statusCartao === 'PAID') {
+          mostraMsg('Pagamento aprovado! Moedas creditadas na hora. 🎉', 'ok');
+        } else if (dados.statusCartao === 'IN_ANALYSIS') {
+          mostraMsg('Pagamento em análise. Você será avisado assim que for aprovado.', 'ok');
+          iniciarPolling(dados.solicitacaoId);
+        }
+      }
+
+      carregarSolicitacoes();
+    } catch (e) {
+      mostraMsg(e.message || 'Erro de conexão. Tente novamente.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = 'Gerar cobrança';
+    }
+  });
+
+  document.getElementById('btnCopiarPix').addEventListener('click', () => {
+    const campo = document.getElementById('qrCodeTexto');
+    campo.select();
+    navigator.clipboard.writeText(campo.value);
+    mostraMsg('Código Pix copiado!', 'ok');
+  });
+
+  document.getElementById('btnSimularPagamento').addEventListener('click', async () => {
+    if (!solicitacaoAtualId) return;
+    const btn = document.getElementById('btnSimularPagamento');
+    btn.disabled = true;
+    btn.textContent = 'Simulando...';
+
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const resp = await fetch('/api/simular-pagamento-sandbox', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ solicitacaoId: solicitacaoAtualId }),
+      });
+      const dados = await resp.json();
+
+      if (!resp.ok) {
+        mostraMsg((dados.erro || 'Falha ao simular') + (dados.detalhes ? ' — ' + JSON.stringify(dados.detalhes) : ''), 'error');
+        return;
+      }
+      mostraMsg(dados.mensagem, 'ok');
+    } catch (e) {
+      mostraMsg('Erro de conexão ao simular.', 'error');
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '🧪 Simular pagamento (só sandbox)';
+    }
+  });
+
+  function iniciarPolling(solicitacaoId) {
+    solicitacaoAtualId = solicitacaoId;
+    if (pollingInterval) clearInterval(pollingInterval);
+    pollingInterval = setInterval(async () => {
+      const { data } = await sb
+        .from('solicitacoes_moedas')
+        .select('status')
+        .eq('id', solicitacaoId)
+        .single();
+
+      if (data && data.status === 'pago') {
+        clearInterval(pollingInterval);
+        document.getElementById('statusPagamento').textContent = 'Pagamento confirmado! Moedas creditadas ✅';
+        carregarSolicitacoes();
+      } else if (data && data.status === 'cancelado') {
+        clearInterval(pollingInterval);
+        document.getElementById('statusPagamento').textContent = 'Pagamento não confirmado ou QR Code expirado.';
+      }
+    }, 4000);
+  }
+
+  async function carregarSolicitacoes() {
+    const { data, error } = await sb
+      .from('solicitacoes_moedas')
+      .select('*')
+      .eq('profissional_id', perfilAtual.id)
+      .order('created_at', { ascending: false });
+
+    const container = document.getElementById('listaSolicitacoes');
+    if (error) { container.innerHTML = '<div class="empty-state">Erro ao carregar.</div>'; return; }
+    if (!data.length) { container.innerHTML = '<div class="empty-state">Nenhuma solicitação ainda.</div>'; return; }
+
+    const statusLabel = { pendente: 'Aguardando pagamento', pago: 'Liberado', cancelado: 'Cancelado' };
+    const statusClasse = { pendente: 'warn', pago: '', cancelado: 'warn' };
+
+    container.innerHTML = data.map(s => `
+      <div class="card">
+        <span class="badge ${statusClasse[s.status]}">${statusLabel[s.status]}</span>
+        <div class="card-title" style="margin-top:8px;">${s.quantidade} moedas — R$ ${s.valor_reais.toFixed(2).replace('.', ',')}</div>
+        <div class="card-meta">${new Date(s.created_at).toLocaleDateString('pt-BR')}</div>
+      </div>
+    `).join('');
+  }
+
+  init();
+</script>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+  }
+</script>
+</body>
+</html>

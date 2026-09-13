@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RicServ — Encontre quem resolve</title>
+<link rel="stylesheet" href="ricserv-styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Google AdSense: depois de ter sua conta aprovada, remova os comentarios e coloque seu ID de editor -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4472840466327433" crossorigin="anonymous"></script>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF4405">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a href="/index.html" class="brand">Ric<span>Serv</span></a>
+    <nav id="navLoggedOut">
+      <a href="/login.html" class="btn btn-ghost">Entrar</a>
+    </nav>
+    <nav id="navLoggedIn" style="display:none;">
+      <a href="/painel.html" class="btn btn-primary">Meu painel</a>
+    </nav>
+  </div>
+
+  <div class="hero">
+    <h1>Diga o que você precisa.<br>A gente te conecta com quem resolve.</h1>
+    <p class="lede">Descreva o serviço em poucas palavras e profissionais da sua região entram em contato com você.</p>
+
+    <div class="search-box">
+      <textarea id="pedidoInput" placeholder="Ex: preciso trocar o chuveiro do banheiro amanhã de manhã..."></textarea>
+      <button class="btn btn-primary" id="btnPedir">Pedir</button>
+    </div>
+
+    <div class="chips">
+      <span class="chip">eletricista</span>
+      <span class="chip">encanador</span>
+      <span class="chip">diarista</span>
+      <span class="chip">pintor</span>
+      <span class="chip">montador de móveis</span>
+      <span class="chip">reforma</span>
+    </div>
+  </div>
+
+  <div class="ad-slot">[ Espaço reservado para anúncio — Banner ]</div>
+
+  <section class="alt">
+    <h2 style="font-size:19px;">Como funciona</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div><strong>Descreva o serviço</strong><p>Conta com suas palavras o que precisa e onde é.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div><strong>Profissionais te respondem</strong><p>Quem atende sua região e o seu tipo de serviço entra em contato.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div><strong>Você escolhe e combina</strong><p>Compare, converse e feche com quem te passar mais confiança.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-pro">
+    <h2>É profissional?</h2>
+    <p>Cadastre-se de graça e veja os pedidos de serviço perto de você, na sua área.</p>
+    <a href="/cadastro.html?perfil=profissional" class="btn btn-primary btn-block">Cadastrar como profissional</a>
+  </div>
+
+  <div class="ad-slot">[ Espaço reservado para anúncio — In-feed ]</div>
+
+  <footer>
+    <a href="/sobre.html">Sobre</a> · <a href="/privacidade.html">Política de Privacidade</a><br>
+    Grupo Riccieri - 2026
+  </footer>
+
+</div>
+
+<script src="config.js"></script>
+<script>
+  // Verifica se já existe sessão ativa e ajusta o menu do topo
+  async function checkSession() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      document.getElementById('navLoggedOut').style.display = 'none';
+      document.getElementById('navLoggedIn').style.display = 'flex';
+    }
+  }
+  checkSession();
+
+  // Ao pedir um serviço, leva para o cadastro (ou painel, se já logado) com o texto preenchido
+  document.getElementById('btnPedir').addEventListener('click', async () => {
+    const texto = document.getElementById('pedidoInput').value.trim();
+    const { data: { session } } = await sb.auth.getSession();
+    if (!texto) {
+      document.getElementById('pedidoInput').focus();
+      return;
+    }
+    const destino = session
+      ? `/painel.html?novoPedido=${encodeURIComponent(texto)}`
+      : `/cadastro.html?perfil=cliente&pedido=${encodeURIComponent(texto)}`;
+    window.location.href = destino;
+  });
+</script>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+  }
+</script>
+</body>
+</html>
