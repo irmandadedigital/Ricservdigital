@@ -137,10 +137,11 @@ export async function onRequestPost({ request, env }) {
     return jsonResponse(403, { erro: 'Apenas profissionais podem comprar moedas' });
   }
 
-  // Boleto exige CPF válido; sem isso o PagBank recusa o pedido.
+  // O PagBank passou a exigir CPF do comprador (customer.tax_id) para
+  // qualquer forma de pagamento, incluindo PIX — não só Boleto/Cartão.
   const cpf = (perfil.cpf || '').replace(/\D/g, '');
-  if ((formaPagamento === 'BOLETO' || formaPagamento === 'CREDIT_CARD') && cpf.length !== 11) {
-    return jsonResponse(400, { erro: 'Cadastre um CPF válido no seu perfil para usar essa forma de pagamento' });
+  if (cpf.length !== 11) {
+    return jsonResponse(400, { erro: 'Cadastre um CPF válido no seu perfil para comprar moedas' });
   }
 
   // Cartão: o front-end já criptografou os dados no navegador (SDK PagSeguro.encryptCard)
