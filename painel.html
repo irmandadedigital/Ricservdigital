@@ -37,7 +37,7 @@
           </div>
           <div class="field">
             <label for="descricao">Detalhes</label>
-            <textarea id="descricao" placeholder="Descreva o serviço, urgência, etc."></textarea>
+            <textarea id="descricao" placeholder="Descreva o serviço, urgência, etc." required></textarea>
           </div>
           <div class="field">
             <label for="cidade">Cidade</label>
@@ -181,6 +181,12 @@
     if (error) { container.innerHTML = '<div class="empty-state">Erro ao carregar pedidos.</div>'; return; }
     if (!data.length) { container.innerHTML = '<div class="empty-state">Nenhum pedido em aberto no momento. Volte mais tarde!</div>'; return; }
 
+    // Nome do cliente aparece de graça; telefone só depois de liberar.
+    const idsPedidos = data.map(p => p.id);
+    const { data: nomes } = await sb.rpc('nomes_clientes_pedidos', { p_request_ids: idsPedidos });
+    const nomeMap = {};
+    (nomes || []).forEach(n => { nomeMap[n.request_id] = n.nome; });
+
     // Descobre quais pedidos esse profissional já liberou antes
     const { data: liberados } = await sb
       .from('contatos_liberados')
@@ -188,7 +194,7 @@
       .eq('profissional_id', perfilAtual.id);
     const idsLiberados = new Set((liberados || []).map(l => l.request_id));
 
-    container.innerHTML = data.map(p => renderCardPedido(p, idsLiberados.has(p.id))).join('');
+    container.innerHTML = data.map(p => renderCardPedido(p, idsLiberados.has(p.id), nomeMap[p.id])).join('');
 
     // Para os já liberados, busca o contato pra exibir direto (sem cobrar de novo)
     idsLiberados.forEach(async (id) => {
@@ -200,12 +206,14 @@
     });
   }
 
-  function renderCardPedido(p, jaLiberado) {
+  function renderCardPedido(p, jaLiberado, nomeCliente) {
+    const primeiroNome = (nomeCliente || 'Cliente').trim().split(' ')[0];
     return `
       <div class="card" id="card-${p.id}">
         <div class="card-title">${escapeHtml(p.titulo)}</div>
         <div class="card-meta">${escapeHtml(p.cidade || '')} · ${formataData(p.created_at)}</div>
         <div class="card-desc">${escapeHtml(p.descricao)}</div>
+        <div style="font-size:13px; color:var(--muted); margin:8px 0;">Cliente: <strong>${escapeHtml(primeiroNome)}</strong> · telefone oculto</div>
         <div id="contato-${p.id}">
           ${jaLiberado
             ? '<div style="font-size:13px; color:var(--muted);">Carregando contato...</div>'
