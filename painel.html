@@ -37,7 +37,7 @@
           </div>
           <div class="field">
             <label for="descricao">Detalhes</label>
-            <textarea id="descricao" placeholder="Descreva o serviço, urgência, etc." required></textarea>
+            <textarea id="descricao" placeholder="Descreva o serviço, urgência, etc."></textarea>
           </div>
           <div class="field">
             <label for="cidade">Cidade</label>
@@ -62,7 +62,7 @@
       </div>
 
       <h2 style="font-size:16px; margin:20px 0 12px;">Pedidos em aberto</h2>
-      <p style="font-size:12px; color:var(--muted); margin:-6px 0 14px;">Liberar o contato de um cliente custa 5 moedas.</p>
+      <p style="font-size:12px; color:var(--muted); margin:-6px 0 14px;"><strong>Liberar o contato do cliente custa 10 moedas.</strong></p>
       <div id="listaPedidosAbertos"></div>
     </div>
   </section>
@@ -209,7 +209,7 @@
         <div id="contato-${p.id}">
           ${jaLiberado
             ? '<div style="font-size:13px; color:var(--muted);">Carregando contato...</div>'
-            : `<button class="btn btn-primary btn-liberar" data-id="${p.id}">Liberar contato (5 moedas)</button>`
+            : `<button class="btn btn-primary btn-liberar" data-id="${p.id}"><strong>Liberar contato (10 moedas)</strong></button>`
           }
         </div>
       </div>
@@ -220,7 +220,7 @@
     const alvo = document.getElementById(`contato-${requestId}`);
     if (cobrar && alvo) alvo.innerHTML = '<div style="font-size:13px; color:var(--muted);">Liberando...</div>';
 
-    const { data, error } = await sb.rpc('liberar_contato', { p_request_id: requestId, p_custo: 5 });
+    const { data, error } = await sb.rpc('liberar_contato', { p_request_id: requestId, p_custo: 10 });
 
     if (error) {
       if (alvo) alvo.innerHTML = `<div class="msg error" style="margin:0;">${error.message.includes('insuficiente') ? 'Saldo de moedas insuficiente.' : 'Não foi possível liberar o contato.'}</div>`;
