@@ -13,6 +13,12 @@
 //
 // Também é idempotente: se o PagBank reenviar a mesma notificação, a
 // solicitação já vai estar com status 'pago' e nada é creditado de novo.
+//
+// Convertida de Netlify Functions para Cloudflare Pages Functions:
+// - exports.handler(event) -> onRequestPost({ request, env })
+// - Node 'crypto' -> Web Crypto API (crypto.subtle), disponível nativamente
+//   no runtime do Cloudflare Workers (não precisa de require).
+// - event.body / event.isBase64Encoded -> await request.text() (texto cru)
 
 async function calcularAssinatura(token, payloadCru) {
   const encoder = new TextEncoder();
@@ -33,18 +39,36 @@ function assinaturasIguais(a, b) {
   return resultado === 0;
 }
 
-async function buscarSolicitacaoPorOrderId(env, orderId) {
-  const resp = await fetch(
-    `${env.SUPABASE_URL}/rest/v1/solicitacoes_moedas?pagbank_order_id=eq.${orderId}&select=*`,
-    {
-      headers: {
-        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
-        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
-      },
-    }
-  );
-  const rows = await resp.json();
-  return rows[0] || null;
+async function buscarSolicitacao(env, { referenciaId, orderId }) {
+  if (referenciaId) {
+    const resp = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/solicitacoes_moedas?referencia_id=eq.${encodeURIComponent(referenciaId)}&select=*`,
+      {
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        },
+      }
+    );
+    const rows = await resp.json();
+    if (rows[0]) return rows[0];
+  }
+  // Fallback: fluxo antigo (Pix/Boleto direto via /orders), que gravava o
+  // pagbank_order_id já na criação, antes de existir referencia_id confiável.
+  if (orderId) {
+    const resp = await fetch(
+      `${env.SUPABASE_URL}/rest/v1/solicitacoes_moedas?pagbank_order_id=eq.${orderId}&select=*`,
+      {
+        headers: {
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+        },
+      }
+    );
+    const rows = await resp.json();
+    if (rows[0]) return rows[0];
+  }
+  return null;
 }
 
 async function marcarComoPago(env, id) {
@@ -126,21 +150,27 @@ export async function onRequestPost({ request, env }) {
     pedidoConfirmado = await resp.json();
   } catch (e) {
     console.error('Falha ao confirmar pedido direto no PagBank', e);
+    // Devolve 500 pra o PagBank tentar reenviar mais tarde.
     return new Response('Falha ao confirmar pedido', { status: 500 });
   }
 
   const chargeConfirmada = pedidoConfirmado.charges && pedidoConfirmado.charges[0];
   if (!chargeConfirmada || chargeConfirmada.status !== 'PAID') {
+    // Notificação de um status que não é pagamento confirmado (ex: DECLINED) — ignora.
     return new Response('OK - nada a creditar', { status: 200 });
   }
 
-  const solicitacao = await buscarSolicitacaoPorOrderId(env, orderId);
+  const solicitacao = await buscarSolicitacao(env, {
+    referenciaId: pedidoConfirmado.reference_id,
+    orderId: orderId,
+  });
   if (!solicitacao) {
-    console.error('Pedido pago sem solicitacao_moedas correspondente', orderId);
+    console.error('Pedido pago sem solicitacao_moedas correspondente', orderId, pedidoConfirmado.reference_id);
     return new Response('OK - solicitacao nao encontrada', { status: 200 });
   }
 
   if (solicitacao.status === 'pago') {
+    // Já processado antes (reenvio do PagBank) — idempotente, não credita de novo.
     return new Response('OK - ja processado', { status: 200 });
   }
 
@@ -153,4 +183,4 @@ export async function onRequestPost({ request, env }) {
   }
 
   return new Response('OK', { status: 200 });
-      }
+}
