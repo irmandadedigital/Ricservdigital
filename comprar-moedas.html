@@ -21,7 +21,7 @@
   <section style="padding-top:0;">
     <h1 style="font-size:20px; margin-bottom:6px;">Comprar moedas</h1>
     <p style="color:var(--muted); font-size:14px; margin:0 0 20px; line-height:1.5;">
-      Cada contato liberado custa 10 moedas. Escolha um pacote, faça o pagamento e aguarde a liberação — geralmente em algumas horas.
+      Cada contato liberado custa 10 moedas. Escolha um pacote e pague — as moedas são creditadas automaticamente assim que o pagamento é confirmado (geralmente em poucos minutos com Pix).
     </p>
 
     <div id="msgBox"></div>
@@ -118,7 +118,8 @@
       const dados = await resp.json();
 
       if (!resp.ok) {
-        mostraMsg(dados.erro || 'Não foi possível gerar a cobrança. Tente novamente.', 'error');
+        const detalhesTexto = dados.detalhes ? ` — ${JSON.stringify(dados.detalhes)}` : '';
+        mostraMsg((dados.erro || 'Não foi possível gerar a cobrança. Tente novamente.') + detalhesTexto, 'error');
         return;
       }
 
