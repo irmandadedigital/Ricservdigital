@@ -29,30 +29,32 @@
       <div class="card-desc" style="margin-top:8px; margin-bottom:0;">Seu perfil já é verificado. Você tem prioridade nos pedidos novos.</div>
     </div>
 
-    <form id="formPerfil">
-      <div class="field">
-        <label for="bio">Descrição e experiência</label>
-        <textarea id="bio" placeholder="Ex: eletricista residencial, 8 anos de experiência, atendo urgências"></textarea>
-      </div>
+    <div class="field">
+      <label for="bio">Descrição e experiência</label>
+      <textarea id="bio" placeholder="Ex: eletricista residencial, 8 anos de experiência, atendo urgências"></textarea>
+    </div>
 
-      <div class="field">
-        <label for="foto_url">Link da sua foto de perfil</label>
-        <input type="url" id="foto_url" placeholder="https://...">
-        <div style="font-size:12px; color:var(--muted); margin-top:4px;">Por enquanto aceita um link de imagem. Upload direto vem em breve.</div>
-      </div>
+    <div class="field">
+      <label>Foto de perfil</label>
+      <div id="previewFoto" style="margin-bottom:10px;"></div>
+      <input type="file" id="inputFoto" accept="image/jpeg,image/png" style="display:none;">
+      <button type="button" class="btn btn-ghost btn-block" id="btnEscolherFoto">Escolher foto (JPEG ou PNG)</button>
+    </div>
 
-      <div class="field">
-        <label for="fotos_trabalho">Fotos de trabalhos anteriores</label>
-        <textarea id="fotos_trabalho" placeholder="Cole um link por linha"></textarea>
-      </div>
+    <div class="field">
+      <label>Fotos de trabalhos anteriores</label>
+      <div id="previewTrabalho" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;"></div>
+      <input type="file" id="inputTrabalho" accept="image/jpeg,image/png" multiple style="display:none;">
+      <button type="button" class="btn btn-ghost btn-block" id="btnEscolherTrabalho">Adicionar fotos (JPEG ou PNG)</button>
+    </div>
 
-      <button type="submit" class="btn btn-primary btn-block">Salvar perfil</button>
-    </form>
+    <button type="button" class="btn btn-primary btn-block" id="btnSalvarBio">Salvar perfil</button>
 
     <div class="card" style="margin-top:20px;">
       <div class="card-title" style="margin-bottom:6px;">Documentos</div>
       <div class="card-desc" id="descDocumento" style="margin-bottom:12px;"></div>
-      <button class="btn btn-ghost btn-block" id="btnEnviarDocumento">Enviar documentos para análise</button>
+      <input type="file" id="inputDocumento" accept="image/jpeg,image/png" style="display:none;">
+      <button class="btn btn-ghost btn-block" id="btnEnviarDocumento">Enviar documento (JPEG ou PNG)</button>
     </div>
   </section>
 
@@ -75,53 +77,146 @@
 
     perfilAtual = perfil;
     document.getElementById('bio').value = perfil.bio || '';
-    document.getElementById('foto_url').value = perfil.foto_url || '';
-    document.getElementById('fotos_trabalho').value = (perfil.fotos_trabalho || []).join('\n');
+
+    renderPreviewFoto();
+    renderPreviewTrabalho();
 
     if (perfil.selo_verificado) document.getElementById('cardSelo').style.display = 'block';
-
     atualizaStatusDocumento(perfil.documento_status);
+  }
+
+  function renderPreviewFoto() {
+    const box = document.getElementById('previewFoto');
+    box.innerHTML = perfilAtual.foto_url
+      ? `<img src="${perfilAtual.foto_url}" style="width:72px; height:72px; object-fit:cover; border-radius:50%; border:1px solid var(--line);">`
+      : '<div style="font-size:13px; color:var(--muted);">Nenhuma foto ainda.</div>';
+  }
+
+  function renderPreviewTrabalho() {
+    const box = document.getElementById('previewTrabalho');
+    const fotos = perfilAtual.fotos_trabalho || [];
+    box.innerHTML = fotos.length
+      ? fotos.map(url => `<img src="${url}" style="width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid var(--line);">`).join('')
+      : '<div style="font-size:13px; color:var(--muted);">Nenhuma foto ainda.</div>';
   }
 
   function atualizaStatusDocumento(status) {
     const desc = document.getElementById('descDocumento');
     const btn = document.getElementById('btnEnviarDocumento');
     const textos = {
-      nao_enviado: 'Você ainda não enviou documentos para verificação.',
-      em_analise: 'Seus documentos estão em análise. Isso costuma levar até 2 dias úteis.',
-      aprovado: 'Documentos aprovados — Selo RicServ ativo.',
-      recusado: 'Não conseguimos validar seus documentos da última vez. Envie novamente.'
+      nao_enviado: 'Você ainda não enviou documento para verificação.',
+      em_analise: 'Seu documento está em análise. Isso costuma levar até 30 minutos.',
+      aprovado: 'Documento aprovado — Selo RicServ ativo.',
+      recusado: 'Não conseguimos validar seu documento da última vez. Envie novamente.'
     };
     desc.textContent = textos[status] || textos.nao_enviado;
     btn.style.display = (status === 'em_analise' || status === 'aprovado') ? 'none' : 'block';
   }
 
-  document.getElementById('formPerfil').addEventListener('submit', async (e) => {
-    e.preventDefault();
+  // Sobe um arquivo pro Storage e devolve a URL pública (bucket 'perfis')
+  async function subirParaPerfis(pasta, file) {
+    const extensao = file.type === 'image/png' ? 'png' : 'jpg';
+    const caminho = `${perfilAtual.id}/${pasta}/${Date.now()}.${extensao}`;
+    const { error } = await sb.storage.from('perfis').upload(caminho, file, {
+      contentType: file.type,
+      upsert: false
+    });
+    if (error) throw error;
+    const { data } = sb.storage.from('perfis').getPublicUrl(caminho);
+    return data.publicUrl;
+  }
+
+  function validaImagem(file) {
+    return file && (file.type === 'image/jpeg' || file.type === 'image/png');
+  }
+
+  // ---- Foto de perfil ----
+  document.getElementById('btnEscolherFoto').addEventListener('click', () => {
+    document.getElementById('inputFoto').click();
+  });
+
+  document.getElementById('inputFoto').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!validaImagem(file)) { mostraMsg('Escolha um arquivo JPEG ou PNG.', 'error'); return; }
+
+    mostraMsg('Enviando foto...', 'ok');
+    try {
+      const url = await subirParaPerfis('foto-perfil', file);
+      const { error } = await sb.from('profiles').update({ foto_url: url }).eq('id', perfilAtual.id);
+      if (error) throw error;
+      perfilAtual.foto_url = url;
+      renderPreviewFoto();
+      mostraMsg('Foto de perfil atualizada!', 'ok');
+    } catch (err) {
+      mostraMsg('Não foi possível enviar a foto. Tente novamente.', 'error');
+    }
+  });
+
+  // ---- Fotos de trabalho ----
+  document.getElementById('btnEscolherTrabalho').addEventListener('click', () => {
+    document.getElementById('inputTrabalho').click();
+  });
+
+  document.getElementById('inputTrabalho').addEventListener('change', async (e) => {
+    const arquivos = Array.from(e.target.files).filter(validaImagem);
+    if (!arquivos.length) { mostraMsg('Escolha arquivos JPEG ou PNG.', 'error'); return; }
+
+    mostraMsg('Enviando fotos...', 'ok');
+    try {
+      const urls = [];
+      for (const file of arquivos) {
+        urls.push(await subirParaPerfis('trabalho', file));
+      }
+      const fotosAtualizadas = [...(perfilAtual.fotos_trabalho || []), ...urls];
+      const { error } = await sb.from('profiles').update({ fotos_trabalho: fotosAtualizadas }).eq('id', perfilAtual.id);
+      if (error) throw error;
+      perfilAtual.fotos_trabalho = fotosAtualizadas;
+      renderPreviewTrabalho();
+      mostraMsg('Fotos adicionadas!', 'ok');
+    } catch (err) {
+      mostraMsg('Não foi possível enviar as fotos. Tente novamente.', 'error');
+    }
+  });
+
+  // ---- Bio ----
+  document.getElementById('btnSalvarBio').addEventListener('click', async () => {
     const bio = document.getElementById('bio').value.trim();
-    const foto_url = document.getElementById('foto_url').value.trim();
-    const fotos_trabalho = document.getElementById('fotos_trabalho').value
-      .split('\n').map(l => l.trim()).filter(Boolean);
-
-    const { error } = await sb.from('profiles')
-      .update({ bio, foto_url, fotos_trabalho })
-      .eq('id', perfilAtual.id);
-
+    const { error } = await sb.from('profiles').update({ bio }).eq('id', perfilAtual.id);
     if (error) { mostraMsg('Não foi possível salvar. Tente novamente.', 'error'); return; }
     mostraMsg('Perfil salvo!', 'ok');
   });
 
-  document.getElementById('btnEnviarDocumento').addEventListener('click', async () => {
-    // Envio real de arquivo (Supabase Storage) fica para uma próxima etapa.
-    // Por ora, isso só sinaliza para você (via documento_status) que o
-    // profissional pediu análise, e a aprovação continua manual.
-    const { error } = await sb.from('profiles')
-      .update({ documento_status: 'em_analise', documento_enviado_em: new Date().toISOString() })
-      .eq('id', perfilAtual.id);
+  // ---- Documento ----
+  document.getElementById('btnEnviarDocumento').addEventListener('click', () => {
+    document.getElementById('inputDocumento').click();
+  });
 
-    if (error) { mostraMsg('Não foi possível enviar agora. Tente novamente.', 'error'); return; }
-    atualizaStatusDocumento('em_analise');
-    mostraMsg('Documentos marcados para análise. Em breve o envio de arquivo será direto por aqui.', 'ok');
+  document.getElementById('inputDocumento').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!validaImagem(file)) { mostraMsg('Escolha um arquivo JPEG ou PNG.', 'error'); return; }
+
+    mostraMsg('Enviando documento...', 'ok');
+    try {
+      const extensao = file.type === 'image/png' ? 'png' : 'jpg';
+      const caminho = `${perfilAtual.id}/documento/${Date.now()}.${extensao}`;
+      const { error: erroUpload } = await sb.storage.from('documentos').upload(caminho, file, {
+        contentType: file.type,
+        upsert: false
+      });
+      if (erroUpload) throw erroUpload;
+
+      const { error } = await sb.from('profiles').update({
+        documento_url: caminho,
+        documento_status: 'em_analise',
+        documento_enviado_em: new Date().toISOString()
+      }).eq('id', perfilAtual.id);
+      if (error) throw error;
+
+      atualizaStatusDocumento('em_analise');
+      mostraMsg('Documento enviado! Você recebe uma resposta em até 30 minutos.', 'ok');
+    } catch (err) {
+      mostraMsg('Não foi possível enviar o documento. Tente novamente.', 'error');
+    }
   });
 
   function mostraMsg(texto, tipo) {
