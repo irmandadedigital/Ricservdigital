@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Completar perfil — RicServ</title>
+<title>Meu painel — RicServ</title>
 <link rel="stylesheet" href="ricserv-styles.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Google AdSense: depois de ter sua conta aprovada, remova os comentarios e coloque seu ID de editor -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4472840466327433" crossorigin="anonymous"></script>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#FF4405">
 </head>
@@ -13,50 +15,69 @@
 <div class="wrap">
 
   <div class="top">
-    <a href="/painel.html" class="brand">‹ Voltar</a>
+    <a href="/index.html" class="brand">Ric<span>Serv</span></a>
+    <button class="btn btn-ghost" id="btnSair">Sair</button>
   </div>
 
   <section style="padding-top:0;">
-    <h1 style="font-size:22px; margin-bottom:6px;">Complete seu perfil</h1>
-    <p style="color:var(--muted); font-size:14px; margin:0 0 20px;">
-      Fotos, descrição e documentos aumentam suas chances de fechar serviço — e liberam o Selo RicServ.
-    </p>
+    <div id="saudacao" style="margin-bottom:16px;">
+      <h1 style="font-size:20px;">Carregando...</h1>
+    </div>
 
     <div id="msgBox"></div>
 
-    <div class="card" id="cardSelo" style="display:none;">
-      <span class="badge">Selo RicServ ✓</span>
-      <div class="card-desc" style="margin-top:8px; margin-bottom:0;">Seu perfil já é verificado. Você tem prioridade nos pedidos novos.</div>
+    <!-- ===== Visão do CLIENTE ===== -->
+    <div id="painelCliente" style="display:none;">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">Novo pedido de serviço</div>
+        <form id="formPedido">
+          <div class="field">
+            <label for="titulo">O que você precisa? (título curto)</label>
+            <input type="text" id="titulo" placeholder="Ex: Instalar chuveiro elétrico" required>
+          </div>
+          <div class="field">
+            <label for="descricao">Detalhes</label>
+            <textarea id="descricao" placeholder="Descreva o serviço, urgência, etc." required></textarea>
+          </div>
+          <div class="field">
+            <label for="cidade">Cidade</label>
+            <input type="text" id="cidade" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Publicar pedido</button>
+        </form>
+      </div>
+
+      <h2 style="font-size:16px; margin: 24px 0 12px;">Meus pedidos</h2>
+      <div id="listaMeusPedidos"></div>
     </div>
 
-    <div class="field">
-      <label for="bio">Descrição e experiência</label>
-      <textarea id="bio" placeholder="Ex: eletricista residencial, 8 anos de experiência, atendo urgências"></textarea>
-    </div>
+    <!-- ===== Visão do PROFISSIONAL ===== -->
+    <div id="painelProfissional" style="display:none;">
+      <a href="/completar-perfil.html" id="bannerPerfil" style="display:none; text-decoration:none; color:inherit;">
+        <div class="card" style="display:flex; align-items:center; gap:12px; background:var(--warn-bg); border-color:transparent;">
+          <div style="flex:1;">
+            <div style="font-weight:700; font-size:14px; color:var(--primary-dark);" id="bannerPerfilTitulo">Complete seu perfil</div>
+            <div style="font-size:12px; color:var(--muted); margin-top:2px;">Ganhe o Selo RicServ e prioridade nos pedidos</div>
+          </div>
+          <div style="font-size:20px; color:var(--primary-dark);">›</div>
+        </div>
+      </a>
 
-    <div class="field">
-      <label>Foto de perfil</label>
-      <div id="previewFoto" style="margin-bottom:10px;"></div>
-      <input type="file" id="inputFoto" accept="image/jpeg,image/png" style="display:none;">
-      <button type="button" class="btn btn-ghost btn-block" id="btnEscolherFoto">Escolher foto (JPEG ou PNG)</button>
-    </div>
+      <div class="card" style="display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <div class="card-meta" style="margin-bottom:2px;">Seu saldo</div>
+          <div class="card-title" id="saldoMoedas" style="font-size:20px;">— moedas</div>
+        </div>
+        <a href="/comprar-moedas.html" class="btn btn-primary">Comprar moedas</a>
+      </div>
 
-    <div class="field">
-      <label>Fotos de trabalhos anteriores</label>
-      <div id="previewTrabalho" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;"></div>
-      <input type="file" id="inputTrabalho" accept="image/jpeg,image/png" multiple style="display:none;">
-      <button type="button" class="btn btn-ghost btn-block" id="btnEscolherTrabalho">Adicionar fotos (JPEG ou PNG)</button>
-    </div>
-
-    <button type="button" class="btn btn-primary btn-block" id="btnSalvarBio">Salvar perfil</button>
-
-    <div class="card" style="margin-top:20px;">
-      <div class="card-title" style="margin-bottom:6px;">Documentos</div>
-      <div class="card-desc" id="descDocumento" style="margin-bottom:12px;"></div>
-      <input type="file" id="inputDocumento" accept="image/jpeg,image/png" style="display:none;">
-      <button class="btn btn-ghost btn-block" id="btnEnviarDocumento">Enviar documento (JPEG ou PNG)</button>
+      <h2 style="font-size:16px; margin:20px 0 12px;">Pedidos em aberto</h2>
+      <p style="font-size:12px; color:var(--muted); margin:-6px 0 14px;">Liberar o contato de um cliente custa 5 moedas.</p>
+      <div id="listaPedidosAbertos"></div>
     </div>
   </section>
+
+  <div class="ad-slot">[ Espaço reservado para anúncio — Painel ]</div>
 
   <footer>
     Grupo Riccieri - 2026
@@ -70,160 +91,251 @@
 
   async function init() {
     const { data: { session } } = await sb.auth.getSession();
-    if (!session) { window.location.href = '/login.html'; return; }
+    if (!session) {
+      window.location.href = '/login.html';
+      return;
+    }
 
-    const { data: perfil, error } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
-    if (error || !perfil) { mostraMsg('Não foi possível carregar seu perfil.', 'error'); return; }
+    const { data: perfil, error } = await sb
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
+
+    if (error || !perfil) {
+      mostraMsg('Não foi possível carregar seu perfil. Tente sair e entrar novamente.', 'error');
+      return;
+    }
 
     perfilAtual = perfil;
-    document.getElementById('bio').value = perfil.bio || '';
+    document.getElementById('saudacao').innerHTML = `<h1 style="font-size:20px;">Olá, ${perfil.nome.split(' ')[0]}</h1>`;
 
-    renderPreviewFoto();
-    renderPreviewTrabalho();
-
-    if (perfil.selo_verificado) document.getElementById('cardSelo').style.display = 'block';
-    atualizaStatusDocumento(perfil.documento_status);
-  }
-
-  function renderPreviewFoto() {
-    const box = document.getElementById('previewFoto');
-    box.innerHTML = perfilAtual.foto_url
-      ? `<img src="${perfilAtual.foto_url}" style="width:72px; height:72px; object-fit:cover; border-radius:50%; border:1px solid var(--line);">`
-      : '<div style="font-size:13px; color:var(--muted);">Nenhuma foto ainda.</div>';
-  }
-
-  function renderPreviewTrabalho() {
-    const box = document.getElementById('previewTrabalho');
-    const fotos = perfilAtual.fotos_trabalho || [];
-    box.innerHTML = fotos.length
-      ? fotos.map(url => `<img src="${url}" style="width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid var(--line);">`).join('')
-      : '<div style="font-size:13px; color:var(--muted);">Nenhuma foto ainda.</div>';
-  }
-
-  function atualizaStatusDocumento(status) {
-    const desc = document.getElementById('descDocumento');
-    const btn = document.getElementById('btnEnviarDocumento');
-    const textos = {
-      nao_enviado: 'Você ainda não enviou documento para verificação.',
-      em_analise: 'Seu documento está em análise. Isso costuma levar até 30 minutos.',
-      aprovado: 'Documento aprovado — Selo RicServ ativo.',
-      recusado: 'Não conseguimos validar seu documento da última vez. Envie novamente.'
-    };
-    desc.textContent = textos[status] || textos.nao_enviado;
-    btn.style.display = (status === 'em_analise' || status === 'aprovado') ? 'none' : 'block';
-  }
-
-  // Sobe um arquivo pro Storage e devolve a URL pública (bucket 'perfis')
-  async function subirParaPerfis(pasta, file) {
-    const extensao = file.type === 'image/png' ? 'png' : 'jpg';
-    const caminho = `${perfilAtual.id}/${pasta}/${Date.now()}.${extensao}`;
-    const { error } = await sb.storage.from('perfis').upload(caminho, file, {
-      contentType: file.type,
-      upsert: false
-    });
-    if (error) throw error;
-    const { data } = sb.storage.from('perfis').getPublicUrl(caminho);
-    return data.publicUrl;
-  }
-
-  function validaImagem(file) {
-    return file && (file.type === 'image/jpeg' || file.type === 'image/png');
-  }
-
-  // ---- Foto de perfil ----
-  document.getElementById('btnEscolherFoto').addEventListener('click', () => {
-    document.getElementById('inputFoto').click();
-  });
-
-  document.getElementById('inputFoto').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!validaImagem(file)) { mostraMsg('Escolha um arquivo JPEG ou PNG.', 'error'); return; }
-
-    mostraMsg('Enviando foto...', 'ok');
-    try {
-      const url = await subirParaPerfis('foto-perfil', file);
-      const { error } = await sb.from('profiles').update({ foto_url: url }).eq('id', perfilAtual.id);
-      if (error) throw error;
-      perfilAtual.foto_url = url;
-      renderPreviewFoto();
-      mostraMsg('Foto de perfil atualizada!', 'ok');
-    } catch (err) {
-      mostraMsg('Não foi possível enviar a foto. Tente novamente.', 'error');
+    if (perfil.role === 'cliente') {
+      document.getElementById('painelCliente').style.display = 'block';
+      preencherPedidoDaBusca();
+      carregarMeusPedidos();
+    } else {
+      document.getElementById('painelProfissional').style.display = 'block';
+      document.getElementById('saldoMoedas').textContent = `${perfil.saldo_moedas} moedas`;
+      mostrarBannerPerfil(perfil);
+      carregarPedidosAbertos();
     }
-  });
+  }
 
-  // ---- Fotos de trabalho ----
-  document.getElementById('btnEscolherTrabalho').addEventListener('click', () => {
-    document.getElementById('inputTrabalho').click();
-  });
+  // Calcula quanto do perfil complementar já foi preenchido (0-100).
+  // Usado só para o banner — quem decide o Selo é a análise de documento.
+  function calcularPercentualPerfil(perfil) {
+    const itens = [
+      !!(perfil.bio && perfil.bio.trim()),
+      !!perfil.foto_url,
+      Array.isArray(perfil.fotos_trabalho) && perfil.fotos_trabalho.length > 0,
+      perfil.documento_status === 'aprovado' || perfil.documento_status === 'em_analise'
+    ];
+    const feitos = itens.filter(Boolean).length;
+    return Math.round((feitos / itens.length) * 100);
+  }
 
-  document.getElementById('inputTrabalho').addEventListener('change', async (e) => {
-    const arquivos = Array.from(e.target.files).filter(validaImagem);
-    if (!arquivos.length) { mostraMsg('Escolha arquivos JPEG ou PNG.', 'error'); return; }
-
-    mostraMsg('Enviando fotos...', 'ok');
-    try {
-      const urls = [];
-      for (const file of arquivos) {
-        urls.push(await subirParaPerfis('trabalho', file));
-      }
-      const fotosAtualizadas = [...(perfilAtual.fotos_trabalho || []), ...urls];
-      const { error } = await sb.from('profiles').update({ fotos_trabalho: fotosAtualizadas }).eq('id', perfilAtual.id);
-      if (error) throw error;
-      perfilAtual.fotos_trabalho = fotosAtualizadas;
-      renderPreviewTrabalho();
-      mostraMsg('Fotos adicionadas!', 'ok');
-    } catch (err) {
-      mostraMsg('Não foi possível enviar as fotos. Tente novamente.', 'error');
-    }
-  });
-
-  // ---- Bio ----
-  document.getElementById('btnSalvarBio').addEventListener('click', async () => {
-    const bio = document.getElementById('bio').value.trim();
-    const { error } = await sb.from('profiles').update({ bio }).eq('id', perfilAtual.id);
-    if (error) { mostraMsg('Não foi possível salvar. Tente novamente.', 'error'); return; }
-    mostraMsg('Perfil salvo!', 'ok');
-  });
-
-  // ---- Documento ----
-  document.getElementById('btnEnviarDocumento').addEventListener('click', () => {
-    document.getElementById('inputDocumento').click();
-  });
-
-  document.getElementById('inputDocumento').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!validaImagem(file)) { mostraMsg('Escolha um arquivo JPEG ou PNG.', 'error'); return; }
-
-    mostraMsg('Enviando documento...', 'ok');
-    try {
-      const extensao = file.type === 'image/png' ? 'png' : 'jpg';
-      const caminho = `${perfilAtual.id}/documento/${Date.now()}.${extensao}`;
-      const { error: erroUpload } = await sb.storage.from('documentos').upload(caminho, file, {
-        contentType: file.type,
-        upsert: false
-      });
-      if (erroUpload) throw erroUpload;
-
-      const { error } = await sb.from('profiles').update({
-        documento_url: caminho,
-        documento_status: 'em_analise',
-        documento_enviado_em: new Date().toISOString()
-      }).eq('id', perfilAtual.id);
-      if (error) throw error;
-
-      atualizaStatusDocumento('em_analise');
-      mostraMsg('Documento enviado! Você recebe uma resposta em até 30 minutos.', 'ok');
-    } catch (err) {
-      mostraMsg('Não foi possível enviar o documento. Tente novamente.', 'error');
-    }
-  });
+  function mostrarBannerPerfil(perfil) {
+    if (perfil.selo_verificado) return; // já tem o selo, não precisa mais do banner
+    const pct = calcularPercentualPerfil(perfil);
+    const banner = document.getElementById('bannerPerfil');
+    document.getElementById('bannerPerfilTitulo').textContent = `Complete seu perfil — ${pct}%`;
+    banner.style.display = 'block';
+  }
 
   function mostraMsg(texto, tipo) {
     document.getElementById('msgBox').innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
   }
 
+  // Se veio da busca da home ("Pedir"), já preenche o formulário
+  function preencherPedidoDaBusca() {
+    const params = new URLSearchParams(window.location.search);
+    const texto = params.get('novoPedido');
+    if (texto) {
+      document.getElementById('descricao').value = texto;
+      document.getElementById('titulo').value = texto.slice(0, 60);
+      document.getElementById('cidade').value = perfilAtual.cidade || '';
+    }
+  }
+
+  document.getElementById('formPedido').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const titulo = document.getElementById('titulo').value.trim();
+    const descricao = document.getElementById('descricao').value.trim();
+    const cidade = document.getElementById('cidade').value.trim();
+
+    const { error } = await sb.from('service_requests').insert({
+      client_id: perfilAtual.id,
+      titulo, descricao, cidade
+    });
+
+    if (error) {
+      mostraMsg('Não foi possível publicar o pedido. Tente novamente.', 'error');
+      return;
+    }
+
+    document.getElementById('formPedido').reset();
+    mostraMsg('Pedido publicado! Profissionais da sua região já podem ver.', 'ok');
+    carregarMeusPedidos();
+  });
+
+  async function carregarMeusPedidos() {
+    const { data, error } = await sb
+      .from('service_requests')
+      .select('*')
+      .eq('client_id', perfilAtual.id)
+      .order('created_at', { ascending: false });
+
+    const container = document.getElementById('listaMeusPedidos');
+    if (error) { container.innerHTML = '<div class="empty-state">Erro ao carregar pedidos.</div>'; return; }
+    if (!data.length) { container.innerHTML = '<div class="empty-state">Você ainda não publicou nenhum pedido.</div>'; return; }
+
+    container.innerHTML = data.map(p => `
+      <div class="card">
+        <span class="badge ${p.status !== 'aberto' ? 'warn' : ''}">${p.status}</span>
+        <div class="card-title" style="margin-top:8px;">${escapeHtml(p.titulo)}</div>
+        <div class="card-meta">${escapeHtml(p.cidade || '')} · ${formataData(p.created_at)}</div>
+        <div class="card-desc">${escapeHtml(p.descricao)}</div>
+      </div>
+    `).join('');
+  }
+
+  let contatosLiberadosCache = {};
+
+  async function carregarPedidosAbertos() {
+    const { data, error } = await sb
+      .from('service_requests')
+      .select('*')
+      .eq('status', 'aberto')
+      .order('created_at', { ascending: false });
+
+    const container = document.getElementById('listaPedidosAbertos');
+    if (error) { container.innerHTML = '<div class="empty-state">Erro ao carregar pedidos.</div>'; return; }
+    if (!data.length) { container.innerHTML = '<div class="empty-state">Nenhum pedido em aberto no momento. Volte mais tarde!</div>'; return; }
+
+    // Separa o que está em janela de prioridade (só selo_verificado vê) do resto.
+    const agora = new Date();
+    const visiveis = [];
+    let escondidosPorPrioridade = 0;
+    data.forEach(p => {
+      const emJanela = p.janela_prioridade_fim && new Date(p.janela_prioridade_fim) > agora;
+      if (emJanela && !perfilAtual.selo_verificado) {
+        escondidosPorPrioridade++;
+        return;
+      }
+      visiveis.push({ ...p, prioridade: emJanela });
+    });
+
+    // Descobre quais pedidos esse profissional já liberou antes
+    const { data: liberados } = await sb
+      .from('contatos_liberados')
+      .select('request_id')
+      .eq('profissional_id', perfilAtual.id);
+    const idsLiberados = new Set((liberados || []).map(l => l.request_id));
+
+    container.innerHTML = visiveis.map(p => renderCardPedido(p, idsLiberados.has(p.id))).join('')
+      + (escondidosPorPrioridade > 0
+          ? `<div class="empty-state">Mais ${escondidosPorPrioridade} pedido(s) em janela de prioridade — visíveis só a profissionais com Selo RicServ por mais alguns minutos.</div>`
+          : '');
+
+    // Para os já liberados, busca o contato pra exibir direto (sem cobrar de novo)
+    idsLiberados.forEach(async (id) => {
+      if (visiveis.some(p => p.id === id)) await revelarContato(id, false);
+    });
+
+    document.querySelectorAll('.btn-liberar').forEach(btn => {
+      btn.addEventListener('click', () => revelarContato(btn.dataset.id, true));
+    });
+
+    // Contadores regressivos nos cards em prioridade
+    iniciarContadoresPrioridade();
+  }
+
+  function renderCardPedido(p, jaLiberado) {
+    const tagPrioridade = p.prioridade
+      ? `<span class="badge" style="background:var(--warn-bg); color:var(--primary-dark); margin-bottom:8px;" data-fim="${p.janela_prioridade_fim}">Prioridade · <span class="contagem"></span></span><br>`
+      : '';
+    return `
+      <div class="card" id="card-${p.id}">
+        ${tagPrioridade}
+        <div class="card-title">${escapeHtml(p.titulo)}</div>
+        <div class="card-meta">${escapeHtml(p.cidade || '')} · ${formataData(p.created_at)}</div>
+        <div class="card-desc">${escapeHtml(p.descricao)}</div>
+        <div id="contato-${p.id}">
+          ${jaLiberado
+            ? '<div style="font-size:13px; color:var(--muted);">Carregando contato...</div>'
+            : `<button class="btn btn-primary btn-liberar" data-id="${p.id}">Liberar contato (5 moedas)</button>`
+          }
+        </div>
+      </div>
+    `;
+  }
+
+  // Atualiza os "expira em m:ss" das tags de prioridade a cada segundo.
+  function iniciarContadoresPrioridade() {
+    if (window._timerPrioridade) clearInterval(window._timerPrioridade);
+    function tick() {
+      document.querySelectorAll('.badge[data-fim]').forEach(el => {
+        const restante = new Date(el.dataset.fim) - new Date();
+        const spanContagem = el.querySelector('.contagem');
+        if (restante <= 0) { spanContagem.textContent = 'expirando...'; return; }
+        const m = Math.floor(restante / 60000);
+        const s = Math.floor((restante % 60000) / 1000).toString().padStart(2, '0');
+        spanContagem.textContent = `expira em ${m}:${s}`;
+      });
+    }
+    tick();
+    window._timerPrioridade = setInterval(tick, 1000);
+  }
+
+  async function revelarContato(requestId, cobrar) {
+    const alvo = document.getElementById(`contato-${requestId}`);
+    if (cobrar && alvo) alvo.innerHTML = '<div style="font-size:13px; color:var(--muted);">Liberando...</div>';
+
+    const { data, error } = await sb.rpc('liberar_contato', { p_request_id: requestId, p_custo: 5 });
+
+    if (error) {
+      if (alvo) alvo.innerHTML = `<div class="msg error" style="margin:0;">${error.message.includes('insuficiente') ? 'Saldo de moedas insuficiente.' : 'Não foi possível liberar o contato.'}</div>`;
+      return;
+    }
+
+    const contato = data[0];
+    if (alvo) {
+      alvo.innerHTML = `<div style="font-size:13px; color:var(--confirm); font-weight:600;">Contato: ${escapeHtml(contato.nome)} — ${escapeHtml(contato.telefone || 'não informado')}</div>`;
+    }
+
+    if (cobrar) {
+      // Atualiza o saldo exibido no topo
+      const { data: perfilAtualizado } = await sb.from('profiles').select('saldo_moedas').eq('id', perfilAtual.id).single();
+      if (perfilAtualizado) {
+        perfilAtual.saldo_moedas = perfilAtualizado.saldo_moedas;
+        document.getElementById('saldoMoedas').textContent = `${perfilAtualizado.saldo_moedas} moedas`;
+      }
+    }
+  }
+
+  function formataData(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  document.getElementById('btnSair').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    window.location.href = '/index.html';
+  });
+
   init();
+</script>
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+  }
 </script>
 </body>
 </html>
