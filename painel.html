@@ -233,7 +233,17 @@
       .eq('profissional_id', perfilAtual.id);
     const idsLiberados = new Set((liberados || []).map(l => l.request_id));
 
-    container.innerHTML = visiveis.map(p => renderCardPedido(p, idsLiberados.has(p.id))).join('')
+    // Quantos profissionais já liberaram contato em cada pedido (máx 4,
+    // igual o GetNinjas) — usado só pra mostrar "3 de 4 já aceitaram".
+    let contagens = {};
+    if (visiveis.length) {
+      const { data: contagemData } = await sb.rpc('contagem_pedidos_liberados', {
+        p_ids: visiveis.map(p => p.id)
+      });
+      (contagemData || []).forEach(c => { contagens[c.request_id] = c.total; });
+    }
+
+    container.innerHTML = visiveis.map(p => renderCardPedido(p, idsLiberados.has(p.id), contagens[p.id] || 0)).join('')
       + (escondidosPorPrioridade > 0
           ? `<div class="empty-state">Mais ${escondidosPorPrioridade} pedido(s) em janela de prioridade — visíveis só a profissionais com Selo RicServ por mais alguns minutos.</div>`
           : '');
@@ -251,21 +261,32 @@
     iniciarContadoresPrioridade();
   }
 
-  function renderCardPedido(p, jaLiberado) {
+  function renderCardPedido(p, jaLiberado, totalAceitos) {
+    const max = p.max_profissionais || 4;
+    const lotado = totalAceitos >= max && !jaLiberado;
     const tagPrioridade = p.prioridade
       ? `<span class="badge" style="background:var(--warn-bg); color:var(--primary-dark); margin-bottom:8px;" data-fim="${p.janela_prioridade_fim}">Prioridade · <span class="contagem"></span></span><br>`
       : '';
+    const tagVagas = totalAceitos > 0
+      ? `<div style="font-size:12px; color:var(--muted); margin-bottom:8px;">${totalAceitos} de ${max} profissionais já aceitaram</div>`
+      : '';
+    let corpoContato;
+    if (jaLiberado) {
+      corpoContato = '<div style="font-size:13px; color:var(--muted);">Carregando contato...</div>';
+    } else if (lotado) {
+      corpoContato = '<div style="font-size:13px; color:var(--muted);">Vaga preenchida — este pedido já tem profissionais suficientes.</div>';
+    } else {
+      corpoContato = `<button class="btn btn-primary btn-liberar" data-id="${p.id}">Liberar contato (5 moedas)</button>`;
+    }
     return `
       <div class="card" id="card-${p.id}">
         ${tagPrioridade}
         <div class="card-title">${escapeHtml(p.titulo)}</div>
         <div class="card-meta">${escapeHtml(p.cidade || '')} · ${formataData(p.created_at)}</div>
         <div class="card-desc">${escapeHtml(p.descricao)}</div>
+        ${tagVagas}
         <div id="contato-${p.id}">
-          ${jaLiberado
-            ? '<div style="font-size:13px; color:var(--muted);">Carregando contato...</div>'
-            : `<button class="btn btn-primary btn-liberar" data-id="${p.id}">Liberar contato (5 moedas)</button>`
-          }
+          ${corpoContato}
         </div>
       </div>
     `;
@@ -295,7 +316,11 @@
     const { data, error } = await sb.rpc('liberar_contato', { p_request_id: requestId, p_custo: 5 });
 
     if (error) {
-      if (alvo) alvo.innerHTML = `<div class="msg error" style="margin:0;">${error.message.includes('insuficiente') ? 'Saldo de moedas insuficiente.' : 'Não foi possível liberar o contato.'}</div>`;
+      let texto = 'Não foi possível liberar o contato.';
+      if (error.message.includes('insuficiente')) texto = 'Saldo de moedas insuficiente.';
+      if (error.message.includes('pedido_lotado')) texto = 'Vaga preenchida — este pedido já tem profissionais suficientes.';
+      if (alvo) alvo.innerHTML = `<div class="msg error" style="margin:0;">${texto}</div>`;
+      if (error.message.includes('pedido_lotado')) carregarPedidosAbertos(); // atualiza a lista/contagem
       return;
     }
 
