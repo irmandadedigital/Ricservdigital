@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Completar perfil — RicServ</title>
+<link rel="stylesheet" href="ricserv-styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#FF4405">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a href="/painel.html" class="brand">‹ Voltar</a>
+  </div>
+
+  <section style="padding-top:0;">
+    <h1 style="font-size:22px; margin-bottom:6px;">Complete seu perfil</h1>
+    <p style="color:var(--muted); font-size:14px; margin:0 0 20px;">
+      Fotos, descrição e documentos aumentam suas chances de fechar serviço — e liberam o Selo RicServ.
+    </p>
+
+    <div id="msgBox"></div>
+
+    <div class="card" id="cardSelo" style="display:none;">
+      <span class="badge">Selo RicServ ✓</span>
+      <div class="card-desc" style="margin-top:8px; margin-bottom:0;">Seu perfil já é verificado. Você tem prioridade nos pedidos novos.</div>
+    </div>
+
+    <form id="formPerfil">
+      <div class="field">
+        <label for="bio">Descrição e experiência</label>
+        <textarea id="bio" placeholder="Ex: eletricista residencial, 8 anos de experiência, atendo urgências"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="foto_url">Link da sua foto de perfil</label>
+        <input type="url" id="foto_url" placeholder="https://...">
+        <div style="font-size:12px; color:var(--muted); margin-top:4px;">Por enquanto aceita um link de imagem. Upload direto vem em breve.</div>
+      </div>
+
+      <div class="field">
+        <label for="fotos_trabalho">Fotos de trabalhos anteriores</label>
+        <textarea id="fotos_trabalho" placeholder="Cole um link por linha"></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">Salvar perfil</button>
+    </form>
+
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title" style="margin-bottom:6px;">Documentos</div>
+      <div class="card-desc" id="descDocumento" style="margin-bottom:12px;"></div>
+      <button class="btn btn-ghost btn-block" id="btnEnviarDocumento">Enviar documentos para análise</button>
+    </div>
+  </section>
+
+  <footer>
+    Grupo Riccieri - 2026
+  </footer>
+
+</div>
+
+<script src="config.js"></script>
+<script>
+  let perfilAtual = null;
+
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = '/login.html'; return; }
+
+    const { data: perfil, error } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+    if (error || !perfil) { mostraMsg('Não foi possível carregar seu perfil.', 'error'); return; }
+
+    perfilAtual = perfil;
+    document.getElementById('bio').value = perfil.bio || '';
+    document.getElementById('foto_url').value = perfil.foto_url || '';
+    document.getElementById('fotos_trabalho').value = (perfil.fotos_trabalho || []).join('\n');
+
+    if (perfil.selo_verificado) document.getElementById('cardSelo').style.display = 'block';
+
+    atualizaStatusDocumento(perfil.documento_status);
+  }
+
+  function atualizaStatusDocumento(status) {
+    const desc = document.getElementById('descDocumento');
+    const btn = document.getElementById('btnEnviarDocumento');
+    const textos = {
+      nao_enviado: 'Você ainda não enviou documentos para verificação.',
+      em_analise: 'Seus documentos estão em análise. Isso costuma levar até 2 dias úteis.',
+      aprovado: 'Documentos aprovados — Selo RicServ ativo.',
+      recusado: 'Não conseguimos validar seus documentos da última vez. Envie novamente.'
+    };
+    desc.textContent = textos[status] || textos.nao_enviado;
+    btn.style.display = (status === 'em_analise' || status === 'aprovado') ? 'none' : 'block';
+  }
+
+  document.getElementById('formPerfil').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const bio = document.getElementById('bio').value.trim();
+    const foto_url = document.getElementById('foto_url').value.trim();
+    const fotos_trabalho = document.getElementById('fotos_trabalho').value
+      .split('\n').map(l => l.trim()).filter(Boolean);
+
+    const { error } = await sb.from('profiles')
+      .update({ bio, foto_url, fotos_trabalho })
+      .eq('id', perfilAtual.id);
+
+    if (error) { mostraMsg('Não foi possível salvar. Tente novamente.', 'error'); return; }
+    mostraMsg('Perfil salvo!', 'ok');
+  });
+
+  document.getElementById('btnEnviarDocumento').addEventListener('click', async () => {
+    // Envio real de arquivo (Supabase Storage) fica para uma próxima etapa.
+    // Por ora, isso só sinaliza para você (via documento_status) que o
+    // profissional pediu análise, e a aprovação continua manual.
+    const { error } = await sb.from('profiles')
+      .update({ documento_status: 'em_analise', documento_enviado_em: new Date().toISOString() })
+      .eq('id', perfilAtual.id);
+
+    if (error) { mostraMsg('Não foi possível enviar agora. Tente novamente.', 'error'); return; }
+    atualizaStatusDocumento('em_analise');
+    mostraMsg('Documentos marcados para análise. Em breve o envio de arquivo será direto por aqui.', 'ok');
+  });
+
+  function mostraMsg(texto, tipo) {
+    document.getElementById('msgBox').innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
+  }
+
+  init();
+</script>
+</body>
+</html>
