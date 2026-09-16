@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — RicServ</title>
+<link rel="stylesheet" href="ricserv-styles.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="top">
+    <a href="/painel.html" class="brand">Ric<span>Serv</span> admin</a>
+  </div>
+
+  <section style="padding-top:0;">
+    <h1 style="font-size:20px; margin-bottom:6px;">Documentos para aprovar</h1>
+    <p style="color:var(--muted); font-size:14px; margin:0 0 16px;">Só você (admin) vê esta página.</p>
+
+    <div id="msgBox"></div>
+    <div id="lista"></div>
+  </section>
+
+  <footer>
+    Grupo Riccieri - 2026
+  </footer>
+
+</div>
+
+<script src="config.js"></script>
+<script>
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) { window.location.href = '/login.html'; return; }
+
+    const { data: perfil } = await sb.from('profiles').select('is_admin').eq('id', session.user.id).single();
+    if (!perfil || !perfil.is_admin) {
+      document.getElementById('lista').innerHTML = '<div class="empty-state">Acesso restrito.</div>';
+      return;
+    }
+
+    carregarPendentes();
+  }
+
+  async function carregarPendentes() {
+    const container = document.getElementById('lista');
+    container.innerHTML = '<div class="empty-state">Carregando...</div>';
+
+    const { data, error } = await sb
+      .from('profiles')
+      .select('*')
+      .eq('documento_status', 'em_analise')
+      .order('documento_enviado_em', { ascending: true });
+
+    if (error) { container.innerHTML = '<div class="empty-state">Erro ao carregar.</div>'; return; }
+    if (!data.length) { container.innerHTML = '<div class="empty-state">Nenhum documento pendente. 🎉</div>'; return; }
+
+    container.innerHTML = '';
+    for (const perfil of data) {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.id = `pendente-${perfil.id}`;
+      card.innerHTML = `
+        <div class="card-title">${escapeHtml(perfil.nome)}</div>
+        <div class="card-meta">${escapeHtml(perfil.cidade || '')} · ${escapeHtml(perfil.telefone || '')}</div>
+        <div class="card-desc">${escapeHtml(perfil.bio || 'Sem descrição preenchida.')}</div>
+        <div id="doc-${perfil.id}" style="margin-bottom:12px; font-size:13px; color:var(--muted);">Carregando documento...</div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary" data-acao="aprovar" data-id="${perfil.id}">Aprovar — dar Selo</button>
+          <button class="btn btn-ghost" data-acao="recusar" data-id="${perfil.id}">Recusar</button>
+        </div>
+      `;
+      container.appendChild(card);
+
+      if (perfil.documento_url) {
+        const { data: assinada, error: erroAssinada } = await sb.storage
+          .from('documentos')
+          .createSignedUrl(perfil.documento_url, 300); // válido 5 minutos
+        const alvo = document.getElementById(`doc-${perfil.id}`);
+        if (erroAssinada || !assinada) {
+          alvo.textContent = 'Não foi possível carregar o documento.';
+        } else {
+          alvo.innerHTML = `<img src="${assinada.signedUrl}" style="max-width:100%; border-radius:8px; border:1px solid var(--line);">`;
+        }
+      }
+    }
+
+    document.querySelectorAll('button[data-acao]').forEach(btn => {
+      btn.addEventListener('click', () => resolverDocumento(btn.dataset.id, btn.dataset.acao));
+    });
+  }
+
+  async function resolverDocumento(id, acao) {
+    const atualizacao = acao === 'aprovar'
+      ? { documento_status: 'aprovado', selo_verificado: true, selo_verificado_em: new Date().toISOString() }
+      : { documento_status: 'recusado', selo_verificado: false };
+
+    const { error } = await sb.from('profiles').update(atualizacao).eq('id', id);
+    if (error) { mostraMsg('Não foi possível salvar. Tente novamente.', 'error'); return; }
+
+    document.getElementById(`pendente-${id}`).remove();
+    mostraMsg(acao === 'aprovar' ? 'Aprovado! Selo RicServ concedido.' : 'Documento recusado.', 'ok');
+  }
+
+  function mostraMsg(texto, tipo) {
+    document.getElementById('msgBox').innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  init();
+</script>
+</body>
+</html>
