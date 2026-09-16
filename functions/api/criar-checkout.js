@@ -82,6 +82,29 @@ async function atualizarSolicitacao(env, id, campos) {
 }
 
 export async function onRequestPost({ request, env }) {
+  // Rede de segurança: NADA sai desta função sem passar por jsonResponse.
+  // Se algo inesperado quebrar lá dentro, o cliente recebe um erro legível
+  // em vez de uma resposta vazia (que é o que causava o
+  // "Unexpected end of JSON input" na tela de comprar moedas).
+  try {
+    return await processarCheckout({ request, env });
+  } catch (e) {
+    console.error('Erro inesperado em criar-checkout', e);
+    return jsonResponse(500, { erro: 'Erro interno ao gerar o pagamento. Tente novamente em instantes.' });
+  }
+}
+
+async function processarCheckout({ request, env }) {
+  // Confere as variáveis de ambiente essenciais ANTES de fazer qualquer
+  // chamada — se alguma faltar no Cloudflare, o erro fica claro na hora,
+  // em vez de quebrar de forma misteriosa mais adiante.
+  const obrigatorias = ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY', 'PAGBANK_TOKEN', 'SITE_URL'];
+  const faltando = obrigatorias.filter((nome) => !env[nome]);
+  if (faltando.length) {
+    console.error('Variáveis de ambiente faltando:', faltando.join(', '));
+    return jsonResponse(500, { erro: `Configuração incompleta no servidor (faltando: ${faltando.join(', ')}).` });
+  }
+
   const PAGBANK_ENV = env.PAGBANK_ENV || 'sandbox';
   const PAGBANK_BASE_URL =
     PAGBANK_ENV === 'production'
@@ -100,7 +123,7 @@ export async function onRequestPost({ request, env }) {
   let body;
   try {
     body = await request.json();
-  } catch {
+  } catch (e) {
     return jsonResponse(400, { erro: 'JSON inválido' });
   }
 
@@ -181,13 +204,13 @@ export async function onRequestPost({ request, env }) {
     pagbankData = await pagbankResp.json();
   } catch (e) {
     console.error('Erro ao chamar PagBank (checkout)', e);
-    await atualizarSolicitacao(env, solicitacao.id, { status: 'cancelado' });
+    await atualizarSolicitacao(env, solicitacao.id, { status: 'cancelado' }).catch(() => {});
     return jsonResponse(502, { erro: 'Falha ao comunicar com o PagBank' });
   }
 
   if (!pagbankResp.ok) {
     console.error('PagBank recusou a criação do checkout', pagbankData);
-    await atualizarSolicitacao(env, solicitacao.id, { status: 'cancelado' });
+    await atualizarSolicitacao(env, solicitacao.id, { status: 'cancelado' }).catch(() => {});
     return jsonResponse(502, {
       erro: 'PagBank recusou a criação do checkout',
       detalhes: pagbankData,
@@ -197,16 +220,16 @@ export async function onRequestPost({ request, env }) {
   const linkPagamento = (pagbankData.links || []).find((l) => l.rel === 'PAY');
   if (!linkPagamento) {
     console.error('PagBank não retornou link PAY', pagbankData);
-    await atualizarSolicitacao(env, solicitacao.id, { status: 'cancelado' });
+    await atualizarSolicitacao(env, solicitacao.id, { status: 'cancelado' }).catch(() => {});
     return jsonResponse(502, { erro: 'PagBank não retornou o link de pagamento' });
   }
 
   await atualizarSolicitacao(env, solicitacao.id, {
     pagbank_checkout_id: pagbankData.id,
-  });
+  }).catch((e) => console.error('Erro ao atualizar solicitacao com checkout id', e));
 
   return jsonResponse(200, {
     solicitacaoId: solicitacao.id,
     checkoutUrl: linkPagamento.href,
   });
-  }
+}
