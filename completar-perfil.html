@@ -88,7 +88,7 @@
   function renderPreviewFoto() {
     const box = document.getElementById('previewFoto');
     box.innerHTML = perfilAtual.foto_url
-      ? `<img src="${perfilAtual.foto_url}" style="width:72px; height:72px; object-fit:cover; border-radius:50%; border:1px solid var(--line);">`
+      ? `<img src="${perfilAtual.foto_url}" style="width:72px; height:72px; object-fit:cover; border-radius:50%; border:1px solid var(--line);" referrerpolicy="no-referrer">`
       : '<div style="font-size:13px; color:var(--muted);">Nenhuma foto ainda.</div>';
   }
 
@@ -96,7 +96,7 @@
     const box = document.getElementById('previewTrabalho');
     const fotos = perfilAtual.fotos_trabalho || [];
     box.innerHTML = fotos.length
-      ? fotos.map(url => `<img src="${url}" style="width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid var(--line);">`).join('')
+      ? fotos.map(url => `<img src="${url}" style="width:64px; height:64px; object-fit:cover; border-radius:8px; border:1px solid var(--line);" referrerpolicy="no-referrer">`).join('')
       : '<div style="font-size:13px; color:var(--muted);">Nenhuma foto ainda.</div>';
   }
 
