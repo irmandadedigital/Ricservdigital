@@ -38,7 +38,7 @@ export async function onRequestGet({ env }) {
     console.error('Erro ao chamar PagBank', e);
     return new Response(JSON.stringify({ erro: 'Falha ao comunicar com o PagBank' }), {
       status: 502,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json' }, 
     });
   }
 }
