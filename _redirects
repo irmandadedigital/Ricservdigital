@@ -1,5 +1,5 @@
 # Sem regras de redirect: o site é 100% páginas HTML reais,
 # cada rota corresponde a um arquivo existente (painel.html, login.html, etc.)
-
+# trigger deploy
 
 
