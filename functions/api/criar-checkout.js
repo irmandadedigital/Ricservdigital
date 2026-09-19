@@ -3,13 +3,11 @@
 // Cria um link de Checkout da InfinitePay (página hospedada por eles, com
 // Pix e cartão juntos) e devolve a URL pra abrir numa nova aba.
 //
-// Bem mais simples que PagBank/Mercado Pago: não tem token de produção vs
-// sandbox pra confundir — só precisa da InfiniteTag (handle) da conta.
-//
 // O valor NUNCA vem do navegador — é sempre resolvido aqui a partir de
 // PACOTES, pra ninguém conseguir forjar um valor menor.
 
 const PACOTES = {
+  teste: { quantidade: 10, valorReais: 10.0 },
   bronze: { quantidade: 20, valorReais: 20.0 },
   prata: { quantidade: 40, valorReais: 35.0 },
   ouro: { quantidade: 80, valorReais: 70.0 },
