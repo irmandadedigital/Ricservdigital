@@ -10,6 +10,28 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4472840466327433" crossorigin="anonymous"></script>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#FF4405">
+<style>
+  .contato-liberado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .btn-whatsapp {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #25D366;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -229,7 +251,13 @@
 
     const contato = data[0];
     if (alvo) {
-      alvo.innerHTML = `<div style="font-size:13px; color:var(--confirm); font-weight:600;">Contato: ${escapeHtml(contato.nome)} — ${escapeHtml(contato.telefone || 'não informado')}</div>`;
+      const zap = linkWhatsApp(contato.telefone);
+      alvo.innerHTML = `
+        <div class="contato-liberado">
+          <div style="font-size:13px; color:var(--confirm); font-weight:600;">Contato: ${escapeHtml(contato.nome)} — ${escapeHtml(contato.telefone || 'não informado')}</div>
+          ${zap ? `<a href="${zap}" target="_blank" rel="noopener" class="btn-whatsapp">📱 WhatsApp</a>` : ''}
+        </div>
+      `;
     }
 
     if (cobrar) {
@@ -251,6 +279,17 @@
     const div = document.createElement('div');
     div.textContent = str || '';
     return div.innerHTML;
+  }
+
+  // Monta o link wa.me a partir do telefone salvo no perfil do cliente.
+  // Remove tudo que não é dígito e garante o código do Brasil (55) na frente,
+  // sem duplicar caso o número já tenha sido salvo com o código.
+  function linkWhatsApp(telefone) {
+    if (!telefone) return null;
+    const numeros = telefone.replace(/\D/g, '');
+    if (!numeros) return null;
+    const comCodigoPais = numeros.startsWith('55') ? numeros : `55${numeros}`;
+    return `https://wa.me/${comCodigoPais}`;
   }
 
   document.getElementById('btnSair').addEventListener('click', async () => {
