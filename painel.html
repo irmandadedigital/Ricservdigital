@@ -53,16 +53,6 @@
 
     <!-- ===== Visão do PROFISSIONAL ===== -->
     <div id="painelProfissional" style="display:none;">
-      <a href="/completar-perfil.html" id="bannerPerfil" style="display:none; text-decoration:none; color:inherit;">
-        <div class="card" style="display:flex; align-items:center; gap:12px; background:var(--warn-bg); border-color:transparent;">
-          <div style="flex:1;">
-            <div style="font-weight:700; font-size:14px; color:var(--primary-dark);" id="bannerPerfilTitulo">Complete seu perfil</div>
-            <div style="font-size:12px; color:var(--muted); margin-top:2px;">Ganhe o Selo RicServ e prioridade nos pedidos</div>
-          </div>
-          <div style="font-size:20px; color:var(--primary-dark);">›</div>
-        </div>
-      </a>
-
       <div class="card" style="display:flex; align-items:center; justify-content:space-between;">
         <div>
           <div class="card-meta" style="margin-bottom:2px;">Seu saldo</div>
@@ -72,7 +62,7 @@
       </div>
 
       <h2 style="font-size:16px; margin:20px 0 12px;">Pedidos em aberto</h2>
-      <p style="font-size:12px; color:var(--muted); margin:-6px 0 14px;">Liberar o contato de um cliente custa 5 moedas.</p>
+      <p style="font-size:12px; color:var(--muted); margin:-6px 0 14px;">Liberar o contato de um cliente custa 10 moedas.</p>
       <div id="listaPedidosAbertos"></div>
     </div>
   </section>
@@ -117,30 +107,8 @@
     } else {
       document.getElementById('painelProfissional').style.display = 'block';
       document.getElementById('saldoMoedas').textContent = `${perfil.saldo_moedas} moedas`;
-      mostrarBannerPerfil(perfil);
       carregarPedidosAbertos();
     }
-  }
-
-  // Calcula quanto do perfil complementar já foi preenchido (0-100).
-  // Usado só para o banner — quem decide o Selo é a análise de documento.
-  function calcularPercentualPerfil(perfil) {
-    const itens = [
-      !!(perfil.bio && perfil.bio.trim()),
-      !!perfil.foto_url,
-      Array.isArray(perfil.fotos_trabalho) && perfil.fotos_trabalho.length > 0,
-      perfil.documento_status === 'aprovado' || perfil.documento_status === 'em_analise'
-    ];
-    const feitos = itens.filter(Boolean).length;
-    return Math.round((feitos / itens.length) * 100);
-  }
-
-  function mostrarBannerPerfil(perfil) {
-    if (perfil.selo_verificado) return; // já tem o selo, não precisa mais do banner
-    const pct = calcularPercentualPerfil(perfil);
-    const banner = document.getElementById('bannerPerfil');
-    document.getElementById('bannerPerfilTitulo').textContent = `Complete seu perfil — ${pct}%`;
-    banner.style.display = 'block';
   }
 
   function mostraMsg(texto, tipo) {
@@ -213,19 +181,6 @@
     if (error) { container.innerHTML = '<div class="empty-state">Erro ao carregar pedidos.</div>'; return; }
     if (!data.length) { container.innerHTML = '<div class="empty-state">Nenhum pedido em aberto no momento. Volte mais tarde!</div>'; return; }
 
-    // Separa o que está em janela de prioridade (só selo_verificado vê) do resto.
-    const agora = new Date();
-    const visiveis = [];
-    let escondidosPorPrioridade = 0;
-    data.forEach(p => {
-      const emJanela = p.janela_prioridade_fim && new Date(p.janela_prioridade_fim) > agora;
-      if (emJanela && !perfilAtual.selo_verificado) {
-        escondidosPorPrioridade++;
-        return;
-      }
-      visiveis.push({ ...p, prioridade: emJanela });
-    });
-
     // Descobre quais pedidos esse profissional já liberou antes
     const { data: liberados } = await sb
       .from('contatos_liberados')
@@ -233,94 +188,42 @@
       .eq('profissional_id', perfilAtual.id);
     const idsLiberados = new Set((liberados || []).map(l => l.request_id));
 
-    // Quantos profissionais já liberaram contato em cada pedido (máx 4,
-    // igual o GetNinjas) — usado só pra mostrar "3 de 4 já aceitaram".
-    let contagens = {};
-    if (visiveis.length) {
-      const { data: contagemData } = await sb.rpc('contagem_pedidos_liberados', {
-        p_ids: visiveis.map(p => p.id)
-      });
-      (contagemData || []).forEach(c => { contagens[c.request_id] = c.total; });
-    }
-
-    container.innerHTML = visiveis.map(p => renderCardPedido(p, idsLiberados.has(p.id), contagens[p.id] || 0)).join('')
-      + (escondidosPorPrioridade > 0
-          ? `<div class="empty-state">Mais ${escondidosPorPrioridade} pedido(s) em janela de prioridade — visíveis só a profissionais com Selo RicServ por mais alguns minutos.</div>`
-          : '');
+    container.innerHTML = data.map(p => renderCardPedido(p, idsLiberados.has(p.id))).join('');
 
     // Para os já liberados, busca o contato pra exibir direto (sem cobrar de novo)
     idsLiberados.forEach(async (id) => {
-      if (visiveis.some(p => p.id === id)) await revelarContato(id, false);
+      if (data.some(p => p.id === id)) await revelarContato(id, false);
     });
 
     document.querySelectorAll('.btn-liberar').forEach(btn => {
       btn.addEventListener('click', () => revelarContato(btn.dataset.id, true));
     });
-
-    // Contadores regressivos nos cards em prioridade
-    iniciarContadoresPrioridade();
   }
 
-  function renderCardPedido(p, jaLiberado, totalAceitos) {
-    const max = p.max_profissionais || 4;
-    const lotado = totalAceitos >= max && !jaLiberado;
-    const tagPrioridade = p.prioridade
-      ? `<span class="badge" style="background:var(--warn-bg); color:var(--primary-dark); margin-bottom:8px;" data-fim="${p.janela_prioridade_fim}">Prioridade · <span class="contagem"></span></span><br>`
-      : '';
-    const tagVagas = totalAceitos > 0
-      ? `<div style="font-size:12px; color:var(--muted); margin-bottom:8px;">${totalAceitos} de ${max} profissionais já aceitaram</div>`
-      : '';
-    let corpoContato;
-    if (jaLiberado) {
-      corpoContato = '<div style="font-size:13px; color:var(--muted);">Carregando contato...</div>';
-    } else if (lotado) {
-      corpoContato = '<div style="font-size:13px; color:var(--muted);">Vaga preenchida — este pedido já tem profissionais suficientes.</div>';
-    } else {
-      corpoContato = `<button class="btn btn-primary btn-liberar" data-id="${p.id}">Liberar contato (5 moedas)</button>`;
-    }
+  function renderCardPedido(p, jaLiberado) {
     return `
       <div class="card" id="card-${p.id}">
-        ${tagPrioridade}
         <div class="card-title">${escapeHtml(p.titulo)}</div>
         <div class="card-meta">${escapeHtml(p.cidade || '')} · ${formataData(p.created_at)}</div>
         <div class="card-desc">${escapeHtml(p.descricao)}</div>
-        ${tagVagas}
         <div id="contato-${p.id}">
-          ${corpoContato}
+          ${jaLiberado
+            ? '<div style="font-size:13px; color:var(--muted);">Carregando contato...</div>'
+            : `<button class="btn btn-primary btn-liberar" data-id="${p.id}">Liberar contato (10 moedas)</button>`
+          }
         </div>
       </div>
     `;
-  }
-
-  // Atualiza os "expira em m:ss" das tags de prioridade a cada segundo.
-  function iniciarContadoresPrioridade() {
-    if (window._timerPrioridade) clearInterval(window._timerPrioridade);
-    function tick() {
-      document.querySelectorAll('.badge[data-fim]').forEach(el => {
-        const restante = new Date(el.dataset.fim) - new Date();
-        const spanContagem = el.querySelector('.contagem');
-        if (restante <= 0) { spanContagem.textContent = 'expirando...'; return; }
-        const m = Math.floor(restante / 60000);
-        const s = Math.floor((restante % 60000) / 1000).toString().padStart(2, '0');
-        spanContagem.textContent = `expira em ${m}:${s}`;
-      });
-    }
-    tick();
-    window._timerPrioridade = setInterval(tick, 1000);
   }
 
   async function revelarContato(requestId, cobrar) {
     const alvo = document.getElementById(`contato-${requestId}`);
     if (cobrar && alvo) alvo.innerHTML = '<div style="font-size:13px; color:var(--muted);">Liberando...</div>';
 
-    const { data, error } = await sb.rpc('liberar_contato', { p_request_id: requestId, p_custo: 5 });
+    const { data, error } = await sb.rpc('liberar_contato', { p_request_id: requestId, p_custo: 10 });
 
     if (error) {
-      let texto = 'Não foi possível liberar o contato.';
-      if (error.message.includes('insuficiente')) texto = 'Saldo de moedas insuficiente.';
-      if (error.message.includes('pedido_lotado')) texto = 'Vaga preenchida — este pedido já tem profissionais suficientes.';
-      if (alvo) alvo.innerHTML = `<div class="msg error" style="margin:0;">${texto}</div>`;
-      if (error.message.includes('pedido_lotado')) carregarPedidosAbertos(); // atualiza a lista/contagem
+      if (alvo) alvo.innerHTML = `<div class="msg error" style="margin:0;">${error.message.includes('insuficiente') ? 'Saldo de moedas insuficiente.' : 'Não foi possível liberar o contato.'}</div>`;
       return;
     }
 
