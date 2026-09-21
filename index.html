@@ -10,6 +10,46 @@
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4472840466327433" crossorigin="anonymous"></script>
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#FF4405">
+<style>
+  .dois-caminhos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 18px 0 4px;
+  }
+  .caminho-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid var(--line, #e4e4e7);
+    border-radius: 12px;
+    padding: 16px 14px;
+    background: var(--surface, #fff);
+  }
+  .caminho-card .emoji {
+    font-size: 22px;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .caminho-card strong {
+    display: block;
+    font-size: 14.5px;
+    margin-bottom: 4px;
+  }
+  .caminho-card p {
+    font-size: 12.5px;
+    color: var(--muted, #6b7280);
+    margin: 0;
+    line-height: 1.35;
+  }
+  .caminho-card.destaque {
+    border-color: #FF4405;
+    background: #FFF3ED;
+  }
+  @media (max-width: 380px) {
+    .caminho-card strong { font-size: 13.5px; }
+  }
+</style>
 </head>
 <body>
 <div class="wrap">
@@ -40,6 +80,19 @@
       <span class="chip">pintor</span>
       <span class="chip">montador de móveis</span>
       <span class="chip">reforma</span>
+    </div>
+
+    <div class="dois-caminhos">
+      <a href="#pedidoInput" class="caminho-card destaque" id="linkPrecisoProfissional">
+        <span class="emoji">👤</span>
+        <strong>Preciso de um profissional</strong>
+        <p>Encontre alguém para realizar seu serviço.</p>
+      </a>
+      <a href="/cadastro.html?perfil=profissional" class="caminho-card">
+        <span class="emoji">🛠️</span>
+        <strong>Sou profissional</strong>
+        <p>Encontre clientes na sua região.</p>
+      </a>
     </div>
   </div>
 
@@ -175,6 +228,14 @@
     }
   }
   checkSession();
+
+  // "Preciso de um profissional" rola suavemente até o campo de pedido, sem pulo brusco
+  document.getElementById('linkPrecisoProfissional').addEventListener('click', (e) => {
+    e.preventDefault();
+    const campo = document.getElementById('pedidoInput');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => campo.focus(), 350);
+  });
 
   // Ao pedir um serviço, leva para o cadastro (ou painel, se já logado) com o texto preenchido
   document.getElementById('btnPedir').addEventListener('click', async () => {
