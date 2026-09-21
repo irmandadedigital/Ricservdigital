@@ -74,6 +74,24 @@
         <button type="button" class="cat-tile" id="btnVerTudo"><span class="emoji">•••</span>Ver tudo</button>
       </div>
     </div>
+
+    <div class="cat-block" id="blocoMaisServicos" style="display:none;">
+      <h3>Mais serviços</h3>
+      <div class="cat-grid">
+        <button type="button" class="cat-tile" data-cat="pedreiro"><span class="emoji">🧱</span>Pedreiro</button>
+        <button type="button" class="cat-tile" data-cat="gesseiro"><span class="emoji">🏠</span>Gesseiro</button>
+        <button type="button" class="cat-tile" data-cat="técnico de ar condicionado"><span class="emoji">❄️</span>Ar condicionado</button>
+        <button type="button" class="cat-tile" data-cat="chaveiro"><span class="emoji">🔑</span>Chaveiro</button>
+        <button type="button" class="cat-tile" data-cat="marido de aluguel"><span class="emoji">🛠️</span>Marido de aluguel</button>
+        <button type="button" class="cat-tile" data-cat="dedetizador"><span class="emoji">🐜</span>Dedetização</button>
+        <button type="button" class="cat-tile" data-cat="frete e mudança"><span class="emoji">🚚</span>Frete e mudança</button>
+        <button type="button" class="cat-tile" data-cat="costureira"><span class="emoji">🧵</span>Costureira</button>
+        <button type="button" class="cat-tile" data-cat="cuidador de idosos"><span class="emoji">🤝</span>Cuidador(a)</button>
+        <button type="button" class="cat-tile" data-cat="personal trainer"><span class="emoji">🏋️</span>Personal trainer</button>
+        <button type="button" class="cat-tile" data-cat="professor particular"><span class="emoji">📚</span>Professor(a)</button>
+        <button type="button" class="cat-tile" data-cat="manicure"><span class="emoji">💅</span>Manicure</button>
+      </div>
+    </div>
   </section>
 
   <section class="alt">
@@ -186,9 +204,14 @@
       setTimeout(() => { campo.focus(); campo.setSelectionRange(campo.value.length, campo.value.length); }, 400);
     });
   });
-  document.getElementById('btnVerTudo').addEventListener('click', () => {
-    document.getElementById('pedidoInput').focus();
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  document.getElementById('btnVerTudo').addEventListener('click', function () {
+    const bloco = document.getElementById('blocoMaisServicos');
+    const abrindo = bloco.style.display === 'none';
+    bloco.style.display = abrindo ? 'block' : 'none';
+    this.innerHTML = abrindo
+      ? '<span class="emoji">▲</span>Ver menos'
+      : '<span class="emoji">•••</span>Ver tudo';
+    if (abrindo) bloco.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 </script>
 <script>
