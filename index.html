@@ -45,6 +45,37 @@
 
   <div class="ad-slot">[ Espaço reservado para anúncio — Banner ]</div>
 
+  <section>
+    <h2 style="font-size:19px; margin-bottom:4px;">Serviços mais procurados</h2>
+    <p style="color:var(--muted); font-size:14px; margin:0 0 4px;">Toque numa categoria pra já começar seu pedido.</p>
+
+    <div class="cat-block" style="margin-top:16px;">
+      <h3>Casa e reparos</h3>
+      <div class="cat-grid">
+        <button type="button" class="cat-tile" data-cat="eletricista"><span class="emoji">⚡</span>Eletricista</button>
+        <button type="button" class="cat-tile" data-cat="encanador"><span class="emoji">🔧</span>Encanador</button>
+        <button type="button" class="cat-tile" data-cat="pintor"><span class="emoji">🎨</span>Pintor</button>
+        <button type="button" class="cat-tile" data-cat="montador de móveis"><span class="emoji">🪑</span>Montador</button>
+      </div>
+    </div>
+
+    <div class="cat-block">
+      <h3>Limpeza</h3>
+      <div class="cat-grid">
+        <button type="button" class="cat-tile" data-cat="diarista"><span class="emoji">🧹</span>Diarista</button>
+        <button type="button" class="cat-tile" data-cat="limpeza de estofados"><span class="emoji">🛋️</span>Estofados</button>
+      </div>
+    </div>
+
+    <div class="cat-block">
+      <h3>Outros</h3>
+      <div class="cat-grid">
+        <button type="button" class="cat-tile" data-cat="jardinagem"><span class="emoji">🌱</span>Jardinagem</button>
+        <button type="button" class="cat-tile" id="btnVerTudo"><span class="emoji">•••</span>Ver tudo</button>
+      </div>
+    </div>
+  </section>
+
   <section class="alt">
     <h2 style="font-size:19px;">Como funciona</h2>
     <div class="steps">
@@ -63,6 +94,27 @@
     </div>
   </section>
 
+  <section>
+    <h2 style="font-size:19px;">O que dizem quem já usou</h2>
+    <div class="testi">
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">Pedi um eletricista de manhã e no mesmo dia já tinha três orçamentos. Rápido e sem enrolação.</p>
+        <div class="testi-autor">Camila R. — Moema, São Paulo</div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★★</div>
+        <p class="testi-text">Gostei de poder descrever o problema com minhas palavras, sem precisar preencher formulário enorme.</p>
+        <div class="testi-autor">Marcos T. — Suzano</div>
+      </div>
+      <div class="testi-card">
+        <div class="testi-stars">★★★★☆</div>
+        <p class="testi-text">Como profissional, o que mais gosto é não pagar mensalidade — só uso moedas quando realmente vale a pena.</p>
+        <div class="testi-autor">João P. — Eletricista, Selo RicServ</div>
+      </div>
+    </div>
+  </section>
+
   <div class="cta-pro">
     <h2>É profissional?</h2>
     <p>Cadastre-se de graça e veja os pedidos de serviço perto de você, na sua área.</p>
@@ -70,6 +122,28 @@
   </div>
 
   <div class="ad-slot">[ Espaço reservado para anúncio — In-feed ]</div>
+
+  <section class="alt">
+    <h2 style="font-size:19px;">Perguntas frequentes</h2>
+    <div class="faq">
+      <details>
+        <summary>É grátis pedir um serviço?</summary>
+        <p>Sim. Publicar seu pedido não custa nada — você só combina o valor do serviço direto com o profissional.</p>
+      </details>
+      <details>
+        <summary>Quanto tempo leva pra alguém responder?</summary>
+        <p>Varia por região e categoria, mas a maioria dos pedidos recebe o primeiro contato em poucos minutos a algumas horas.</p>
+      </details>
+      <details>
+        <summary>Como sei que o profissional é de confiança?</summary>
+        <p>Fique atento ao Selo RicServ ✓ — ele indica que o profissional passou por verificação de documento. Você também pode ver a avaliação de outros clientes.</p>
+      </details>
+      <details>
+        <summary>Posso usar o RicServ pra oferecer meus serviços?</summary>
+        <p>Sim! O cadastro de profissional é gratuito, sem mensalidade — você só usa moedas quando decide liberar o contato de um cliente.</p>
+      </details>
+    </div>
+  </section>
 
   <footer>
     <a href="/sobre.html">Sobre</a> · <a href="/privacidade.html">Política de Privacidade</a><br>
@@ -102,6 +176,19 @@
       ? `/painel.html?novoPedido=${encodeURIComponent(texto)}`
       : `/cadastro.html?perfil=cliente&pedido=${encodeURIComponent(texto)}`;
     window.location.href = destino;
+  });
+  // Toque numa categoria já preenche o campo de pedido e leva pro topo
+  document.querySelectorAll('.cat-tile[data-cat]').forEach(tile => {
+    tile.addEventListener('click', () => {
+      const campo = document.getElementById('pedidoInput');
+      campo.value = `Preciso de um ${tile.dataset.cat}: `;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setTimeout(() => { campo.focus(); campo.setSelectionRange(campo.value.length, campo.value.length); }, 400);
+    });
+  });
+  document.getElementById('btnVerTudo').addEventListener('click', () => {
+    document.getElementById('pedidoInput').focus();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 </script>
 <script>
