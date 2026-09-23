@@ -1,21 +1,29 @@
-/* RicServ — identidade visual: confiança + mão na massa */
-
-@import url('https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700&family=Work+Sans:wght@400;500;600;700&display=swap');
+/* RicServ — identidade visual: confiança + mão na massa (v2: cores vivas + fontes arredondadas) */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Work+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
   --bg: #FFFFFF;
   --surface: #FFFFFF;
-  --surface-alt: #F5F8FF;
+  --surface-alt: #FFF3E9;
   --ink: #16181D;
   --muted: #5B6472;
-  --line: #E6E9F0;
+  --line: #F0DFCB;
+
   --primary: #FF4405;
   --primary-dark: #D63600;
+  --gold: #FFB800;
+
   --accent: #0A84FF;
-  --accent-bg: #E5F1FF;
+  --accent-bg: #E1EFFF;
+
+  --purple: #7C3AED;
+  --purple-bg: #EDE4FC;
+
   --confirm: #0FAE6E;
   --confirm-bg: #DFFAEE;
   --warn-bg: #FFE9DE;
+
+  --hero-gradient: linear-gradient(135deg, #FF4405 0%, #FF7A00 55%, #FFB800 100%);
 }
 
 * { box-sizing: border-box; }
@@ -32,7 +40,7 @@ body {
 .wrap { max-width: 480px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; }
 
 h1, h2, h3, .brand {
-  font-family: 'Bitter', serif;
+  font-family: 'Fredoka', sans-serif;
   font-weight: 600;
   letter-spacing: -0.01em;
   margin: 0;
@@ -47,20 +55,18 @@ a { color: inherit; }
   justify-content: space-between;
   padding: 18px 20px;
 }
-
 .brand {
-  font-size: 25px;
+  font-size: 26px;
   color: var(--ink);
   text-decoration: none;
 }
 .brand span { color: var(--primary); }
-
 .top nav { display: flex; gap: 10px; }
 
 .btn {
   display: inline-block;
-  padding: 12px 18px;
-  border-radius: 10px;
+  padding: 12px 20px;
+  border-radius: 999px;
   font-weight: 700;
   font-size: 16px;
   text-decoration: none;
@@ -74,27 +80,32 @@ a { color: inherit; }
 .btn-block { width: 100%; text-align: center; }
 
 /* Hero */
-.hero { padding: 12px 20px 28px; }
+.hero {
+  padding: 28px 20px 34px;
+  background: var(--hero-gradient);
+  border-radius: 0 0 28px 28px;
+  color: #fff;
+}
 .hero h1 {
   font-size: 34px;
   line-height: 1.15;
   margin-bottom: 12px;
+  color: #fff;
 }
 .hero p.lede {
-  color: var(--muted);
+  color: rgba(255,255,255,0.9);
   font-size: 17px;
   margin: 0 0 20px;
   line-height: 1.5;
 }
-
 .search-box {
   background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 14px;
+  border: none;
+  border-radius: 18px;
   padding: 6px;
   display: flex;
   gap: 6px;
-  box-shadow: 0 12px 30px -18px rgba(22,36,28,0.25);
+  box-shadow: 0 14px 34px -14px rgba(0,0,0,0.35);
 }
 .search-box textarea {
   flex: 1;
@@ -108,20 +119,17 @@ a { color: inherit; }
   color: var(--ink);
 }
 .search-box textarea:focus { outline: none; }
-.search-box button {
-  align-self: flex-end;
-  margin: 4px;
-}
+.search-box button { align-self: flex-end; margin: 4px; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
 .chip {
-  background: var(--accent-bg);
-  border: 1px solid transparent;
+  background: rgba(255,255,255,0.22);
+  border: 1px solid rgba(255,255,255,0.4);
   padding: 8px 14px;
   border-radius: 999px;
   font-size: 14px;
-  font-weight: 600;
-  color: var(--accent);
+  font-weight: 700;
+  color: #fff;
 }
 
 /* Seções */
@@ -131,12 +139,13 @@ section.alt { background: var(--surface-alt); border-top: 1px solid var(--line);
 .steps { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
 .step { display: flex; gap: 14px; align-items: flex-start; }
 .step-num {
-  font-family: 'Bitter', serif;
+  font-family: 'Fredoka', sans-serif;
   font-weight: 600;
   font-size: 15px;
-  color: var(--primary);
-  border: 1.5px solid var(--primary);
-  width: 28px; height: 28px;
+  color: #fff;
+  background: var(--primary);
+  border: none;
+  width: 30px; height: 30px;
   border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
@@ -145,32 +154,33 @@ section.alt { background: var(--surface-alt); border-top: 1px solid var(--line);
 .step strong { font-size: 16px; }
 
 .cta-pro {
-  background: var(--ink);
+  background: linear-gradient(135deg, #1A1D24, #2B2F3A);
   color: #fff;
-  border-radius: 16px;
+  border-radius: 20px;
   padding: 24px 20px;
   margin: 8px 20px 0;
 }
 .cta-pro h2 { color: #fff; font-size: 22px; margin-bottom: 8px; }
 .cta-pro p { color: #C9D2CC; font-size: 15px; margin: 0 0 16px; line-height: 1.5; }
-.cta-pro .btn-primary { background: var(--primary); }
+.cta-pro .btn-primary { background: var(--gold); color: #23262E; box-shadow: 0 6px 16px -6px rgba(255,184,0,0.55); }
 
 /* Cards de pedido / profissional */
 .card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 8px 24px -18px rgba(22,24,29,0.25);
 }
-.card-title { font-weight: 700; font-size: 16px; margin-bottom: 4px; }
+.card-title { font-weight: 700; font-size: 16px; margin-bottom: 4px; font-family: 'Fredoka', sans-serif; }
 .card-meta { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
 .card-desc { font-size: 15px; line-height: 1.5; margin-bottom: 12px; color: #333A44; }
 .badge {
   display: inline-block;
   font-size: 12px;
   font-weight: 700;
-  padding: 4px 10px;
+  padding: 4px 12px;
   border-radius: 999px;
   background: var(--confirm-bg);
   color: var(--confirm);
@@ -187,9 +197,9 @@ section.alt { background: var(--surface-alt); border-top: 1px solid var(--line);
 }
 .field input, .field select, .field textarea {
   width: 100%;
-  padding: 13px 14px;
+  padding: 13px 16px;
   border: 1.5px solid var(--line);
-  border-radius: 10px;
+  border-radius: 14px;
   font-family: 'Work Sans', sans-serif;
   font-size: 16px;
   background: var(--surface);
@@ -205,7 +215,7 @@ section.alt { background: var(--surface-alt); border-top: 1px solid var(--line);
 .role-toggle label {
   flex: 1;
   border: 1.5px solid var(--line);
-  border-radius: 10px;
+  border-radius: 14px;
   padding: 12px;
   text-align: center;
   font-size: 13px;
@@ -217,7 +227,7 @@ section.alt { background: var(--surface-alt); border-top: 1px solid var(--line);
 .role-toggle input:checked + span { color: var(--primary); }
 .role-toggle label:has(input:checked) { border-color: var(--primary); background: var(--warn-bg); }
 
-.msg { font-size: 13px; padding: 10px 12px; border-radius: 8px; margin-bottom: 14px; }
+.msg { font-size: 13px; padding: 10px 14px; border-radius: 12px; margin-bottom: 14px; }
 .msg.error { background: var(--warn-bg); color: var(--primary-dark); }
 .msg.ok { background: var(--confirm-bg); color: var(--confirm); }
 
@@ -227,9 +237,9 @@ section.alt { background: var(--surface-alt); border-top: 1px solid var(--line);
   text-align: center;
   padding: 12px 0;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--muted);
-  border-bottom: 2px solid transparent;
+  border-bottom: 3px solid transparent;
 }
 .tab.active { color: var(--ink); border-color: var(--primary); }
 
@@ -239,7 +249,7 @@ section.alt { background: var(--surface-alt); border-top: 1px solid var(--line);
   text-align: center;
   background: var(--surface-alt);
   border: 1px dashed var(--line);
-  border-radius: 10px;
+  border-radius: 14px;
   color: var(--muted);
   font-size: 11px;
 }
@@ -261,7 +271,7 @@ footer {
 }
 footer a { color: var(--muted); }
 
-/* Categorias na home */
+/* Categorias na home — ícones com cores variadas, estilo "app vivo" */
 .cat-block { margin-bottom: 22px; }
 .cat-block:last-child { margin-bottom: 0; }
 .cat-block h3 {
@@ -271,18 +281,19 @@ footer a { color: var(--muted); }
   text-transform: uppercase;
   letter-spacing: 0.04em;
   margin-bottom: 10px;
+  font-family: 'Work Sans', sans-serif;
 }
 .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .cat-tile {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 14px;
   display: flex;
   align-items: center;
   gap: 10px;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   text-align: left;
   width: 100%;
@@ -290,17 +301,28 @@ footer a { color: var(--muted); }
   font-family: 'Work Sans', sans-serif;
 }
 .cat-tile:active { border-color: var(--primary); background: var(--warn-bg); }
-.cat-tile .emoji { font-size: 20px; }
+.cat-tile .emoji {
+  font-size: 20px;
+  width: 38px; height: 38px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 12px;
+  background: var(--accent-bg);
+}
+/* varia a cor de fundo do ícone conforme a posição, pra ficar mais vivo */
+.cat-tile:nth-child(4n+1) .emoji { background: var(--warn-bg); }
+.cat-tile:nth-child(4n+2) .emoji { background: var(--accent-bg); }
+.cat-tile:nth-child(4n+3) .emoji { background: var(--confirm-bg); }
+.cat-tile:nth-child(4n+4) .emoji { background: var(--purple-bg); }
 
 /* Depoimentos */
 .testi { display: flex; flex-direction: column; gap: 14px; margin-top: 16px; }
 .testi-card {
   background: var(--surface);
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 18px;
   padding: 16px;
 }
-.testi-stars { color: var(--primary); font-size: 14px; margin-bottom: 8px; letter-spacing: 2px; }
+.testi-stars { color: var(--gold); font-size: 14px; margin-bottom: 8px; letter-spacing: 2px; }
 .testi-text { font-size: 15px; line-height: 1.5; color: #333A44; margin-bottom: 10px; }
 .testi-autor { font-size: 13px; font-weight: 700; color: var(--muted); }
 
