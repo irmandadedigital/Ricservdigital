@@ -23,7 +23,7 @@
   --confirm-bg: #DFFAEE;
   --warn-bg: #FFE9DE;
 
-  --hero-gradient: linear-gradient(160deg, #0D0A2B 0%, #2C1466 35%, #7A2EBF 65%, #FF6A00 100%);
+  --hero-gradient: linear-gradient(160deg, #1E3A8A 0%, #4C2E9E 35%, #9B3FD1 65%, #FF6A00 100%);
 }
 
 * { box-sizing: border-box; }
@@ -154,7 +154,7 @@ section.alt { background: var(--surface-alt); border-top: 1px solid var(--line);
 .step strong { font-size: 16px; }
 
 .cta-pro {
-  background: linear-gradient(135deg, #0D0A2B, #2C1466);
+  background: linear-gradient(135deg, #1E3A8A, #4C2E9E);
   color: #fff;
   border-radius: 20px;
   padding: 24px 20px;
