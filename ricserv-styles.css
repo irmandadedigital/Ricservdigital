@@ -79,25 +79,59 @@ a { color: inherit; }
 .btn-ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
 .btn-block { width: 100%; text-align: center; }
 
-/* Hero */
+/* Hero (com nav dentro, fundo azul-marinho + logo) */
+.hero-wrap {
+  background: linear-gradient(160deg, #0A1B38 0%, #123063 60%, #163A78 100%);
+  border-radius: 0 0 32px 32px;
+  position: relative;
+  overflow: hidden;
+  padding-bottom: 44px;
+}
+.hero-wrap .top { padding: 16px 20px; }
+.hero-wrap .brand img { height: 42px; display: block; }
+.hero-wrap .btn-primary {
+  background: var(--gold);
+  color: #16233F;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 16px -6px rgba(255,184,0,0.5);
+}
+.hero-wrap .menu-icon {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 22px;
+  padding: 6px;
+}
+
 .hero {
-  padding: 28px 20px 34px;
-  background: var(--hero-gradient);
-  border-radius: 0 0 28px 28px;
+  padding: 10px 20px 0;
+  background: none;
+  border-radius: 0;
   color: #fff;
 }
-.hero h1 {
-  font-size: 34px;
-  line-height: 1.15;
-  margin-bottom: 12px;
-  color: #fff;
+.hero h1 { font-size: 30px; line-height: 1.2; color: #fff; }
+.hero h1 .highlight { color: var(--gold); }
+.hero p.lede { color: rgba(255,255,255,0.85); }
+
+.hero-photo {
+  margin: 16px 0 18px;
+  border-radius: 18px;
+  overflow: hidden;
+  min-height: 180px;
+  background: linear-gradient(135deg, #163A78, #0A1B38);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.35);
+  font-size: 13px;
+  text-align: center;
+  padding: 20px;
+  background-size: cover;
+  background-position: center;
 }
-.hero p.lede {
-  color: rgba(255,255,255,0.9);
-  font-size: 17px;
-  margin: 0 0 20px;
-  line-height: 1.5;
-}
+
 .search-box {
   background: var(--surface);
   border: none;
@@ -105,7 +139,7 @@ a { color: inherit; }
   padding: 6px;
   display: flex;
   gap: 6px;
-  box-shadow: 0 14px 34px -14px rgba(0,0,0,0.35);
+  box-shadow: 0 14px 34px -14px rgba(0,0,0,0.5);
 }
 .search-box textarea {
   flex: 1;
@@ -122,15 +156,98 @@ a { color: inherit; }
 .search-box button { align-self: flex-end; margin: 4px; }
 
 .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+.wave-divider {
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  line-height: 0;
+}
+.wave-divider svg { width: 100%; height: auto; display: block; }
+
+/* Chips estilo "pill" contornado, fundo escuro */
 .chip {
-  background: rgba(255,255,255,0.22);
-  border: 1px solid rgba(255,255,255,0.4);
-  padding: 8px 14px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid var(--gold);
+  padding: 10px 16px;
   border-radius: 999px;
   font-size: 14px;
   font-weight: 700;
   color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
+.chip .icon { color: var(--gold); font-size: 15px; }
+
+/* Cards de destaque (Preciso de um profissional / Sou profissional) */
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 4px;
+  padding: 0 20px;
+  position: relative;
+  z-index: 1;
+}
+.feature-card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  padding: 18px 16px 20px;
+  min-height: 168px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  color: #fff;
+  text-decoration: none;
+  background: linear-gradient(160deg, #0A1B38 0%, #1B4488 100%);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.feature-card .icon-top {
+  position: absolute;
+  top: 16px; left: 16px;
+  font-size: 26px;
+  color: var(--gold);
+}
+.feature-card h3 { font-size: 17px; color: #fff; margin-bottom: 4px; line-height: 1.2; }
+.feature-card p { font-size: 13px; color: rgba(255,255,255,0.75); margin: 0; line-height: 1.4; }
+.feature-card .arrow {
+  position: absolute;
+  bottom: 16px; right: 14px;
+  color: var(--gold);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* Fileira de selos de confiança */
+.trust-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  padding: 22px 12px 8px;
+  position: relative;
+  z-index: 1;
+}
+.trust-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  flex: 1;
+  position: relative;
+}
+.trust-item .icon { font-size: 22px; color: var(--gold); }
+.trust-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 4px;
+  width: 1px; height: 34px;
+  background: rgba(255,255,255,0.15);
+}
+
 
 /* Seções */
 section { padding: 24px 20px; }
