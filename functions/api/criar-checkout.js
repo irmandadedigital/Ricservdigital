@@ -8,6 +8,7 @@
 
 const PACOTES = {
   teste: { quantidade: 10, valorReais: 10.0 },
+  inicial: { quantidade: 10, valorReais: 9.9 },
   bronze: { quantidade: 20, valorReais: 20.0 },
   prata: { quantidade: 40, valorReais: 35.0 },
   ouro: { quantidade: 80, valorReais: 70.0 },
