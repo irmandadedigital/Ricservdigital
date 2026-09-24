@@ -4,10 +4,10 @@
 :root {
   --bg: #FFFFFF;
   --surface: #FFFFFF;
-  --surface-alt: #FFF3E9;
+  --surface-alt: #F3F6FC;
   --ink: #16181D;
   --muted: #5B6472;
-  --line: #F0DFCB;
+  --line: #E6EAF5;
 
   --primary: #FF4405;
   --primary-dark: #D63600;
@@ -16,14 +16,14 @@
   --accent: #0A84FF;
   --accent-bg: #E1EFFF;
 
-  --purple: #7C3AED;
+  --purple: #4B1F91;
   --purple-bg: #EDE4FC;
 
   --confirm: #0FAE6E;
   --confirm-bg: #DFFAEE;
   --warn-bg: #FFE9DE;
 
-  --hero-gradient: linear-gradient(135deg, #FF4405 0%, #FF7A00 55%, #FFB800 100%);
+  --hero-gradient: linear-gradient(160deg, #0D0A2B 0%, #2C1466 35%, #7A2EBF 65%, #FF6A00 100%);
 }
 
 * { box-sizing: border-box; }
@@ -154,7 +154,7 @@ section.alt { background: var(--surface-alt); border-top: 1px solid var(--line);
 .step strong { font-size: 16px; }
 
 .cta-pro {
-  background: linear-gradient(135deg, #1A1D24, #2B2F3A);
+  background: linear-gradient(135deg, #0D0A2B, #2C1466);
   color: #fff;
   border-radius: 20px;
   padding: 24px 20px;
