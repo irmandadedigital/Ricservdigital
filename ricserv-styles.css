@@ -1,3 +1,4 @@
+```css
 /* RicServ — identidade visual: confiança + mão na massa (v2: cores vivas + fontes arredondadas) */
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Work+Sans:wght@400;500;600;700;800&display=swap');
 
@@ -9,8 +10,8 @@
   --muted: #5B6472;
   --line: #E6EAF5;
 
-  --primary: #FF4405;
-  --primary-dark: #D63600;
+  --primary: #1565C0;
+  --primary-dark: #0D47A1;
   --gold: #FFB800;
 
   --accent: #0A84FF;
@@ -21,7 +22,7 @@
 
   --confirm: #0FAE6E;
   --confirm-bg: #DFFAEE;
-  --warn-bg: #FFE9DE;
+  --warn-bg: #DCE9FF;
 
   --hero-gradient: linear-gradient(160deg, #1E3A8A 0%, #4C2E9E 35%, #9B3FD1 65%, #FF6A00 100%);
 }
@@ -74,7 +75,7 @@ a { color: inherit; }
   cursor: pointer;
   font-family: 'Work Sans', sans-serif;
 }
-.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 6px 16px -6px rgba(255,68,5,0.55); }
+.btn-primary { background: var(--primary); color: #fff; box-shadow: 0 6px 16px -6px rgba(21,101,192,0.55); }
 .btn-primary:active { background: var(--primary-dark); }
 .btn-ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--line); }
 .btn-block { width: 100%; text-align: center; }
@@ -463,3 +464,4 @@ footer a { color: var(--muted); }
 .faq summary::after { content: '+'; font-size: 20px; color: var(--primary); font-weight: 400; }
 .faq details[open] summary::after { content: '–'; }
 .faq p { margin: 10px 0 0; font-size: 14px; color: var(--muted); line-height: 1.5; }
+```
