@@ -6,191 +6,231 @@
 <title>Cadastre-se — RicServ</title>
 <link rel="stylesheet" href="ricserv-styles.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Google AdSense: depois de ter sua conta aprovada, remova os comentarios e coloque seu ID de editor -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#FF4405">
 </head>
 <body>
 <div class="wrap">
-<div class="top">
-<a href="/index.html" class="brand">Ric<span>Serv</span></a>
-</div>
 
-<section style="padding-top:4px;">
-<h1 style="font-size:22px; margin-bottom:6px;">Criar conta</h1>
-<p style="color:var(--muted); font-size:14px; margin:0 0 20px;">Leva menos de 1 minuto.</p>
+  <div class="top">
+    <a href="/index.html" class="brand">Ric<span>Serv</span></a>
+  </div>
 
-<div id="msgBox"></div>
+  <section style="padding-top:4px;">
+    <h1 style="font-size:22px; margin-bottom:6px;">Criar conta</h1>
+    <p style="color:var(--muted); font-size:14px; margin:0 0 20px;">Leva menos de 1 minuto.</p>
 
-<form id="formCadastro">
-<div class="role-toggle">
-<label>
-<input type="radio" name="role" value="cliente" checked>
-<span>Sou cliente<br><small style="font-weight:400;">quero contratar</small></span>
-</label>
-<label>
-<input type="radio" name="role" value="profissional">
-<span>Sou profissional<br><small style="font-weight:400;">quero oferecer serviços</small></span>
-</label>
-</div>
+    <div id="msgBox"></div>
 
-<div class="field">
-<label for="nome">Nome completo</label>
-<input type="text" id="nome" required>
-</div>
+    <form id="formCadastro">
+      <div class="role-toggle">
+        <label>
+          <input type="radio" name="role" value="cliente" checked>
+          <span>Sou cliente<br><small style="font-weight:400;">quero contratar</small></span>
+        </label>
+        <label>
+          <input type="radio" name="role" value="profissional">
+          <span>Sou profissional<br><small style="font-weight:400;">quero oferecer serviços</small></span>
+        </label>
+      </div>
 
-<div class="field">
-<label for="email">E-mail</label>
-<input type="email" id="email" required>
-</div>
+      <div class="field">
+        <label for="nome">Nome completo</label>
+        <input type="text" id="nome" required>
+      </div>
 
-<div class="field">
-<label for="senha">Senha</label>
-<input type="password" id="senha" minlength="6" required>
-</div>
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" required>
+      </div>
 
-<div class="field">
-<label for="telefone">Telefone / WhatsApp</label>
-<input type="tel" id="telefone" placeholder="(00) 00000-0000" required>
-</div>
+      <div class="field">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" minlength="6" required>
+      </div>
 
-<div class="field">
-<label for="cidade">Cidade</label>
-<input type="text" id="cidade" required>
-</div>
+      <div class="field">
+        <label for="telefone">Telefone / WhatsApp</label>
+        <input type="tel" id="telefone" placeholder="(00) 00000-0000" required>
+      </div>
 
-<div class="field" id="campoBio" style="display:none;">
-<label for="bio">Quais serviços você oferece?</label>
-<textarea id="bio" placeholder="Ex: eletricista residencial, instalação de chuveiros e tomadas, 8 anos de experiência"></textarea>
-</div>
+      <div class="field">
+        <label for="cpf">CPF</label>
+        <input type="text" id="cpf" inputmode="numeric" placeholder="000.000.000-00" maxlength="14" required>
+      </div>
 
-<button type="submit" class="btn btn-primary btn-block" id="btnCadastrar">Criar conta</button>
-</form>
+      <div class="field">
+        <label for="cidade">Cidade</label>
+        <input type="text" id="cidade" required>
+      </div>
 
-<div id="telaConfirmacao" style="display:none; text-align:center; padding:20px 0;">
-<div style="font-size:44px; margin-bottom:10px;">📩</div>
-<h2 style="font-size:19px; margin-bottom:10px;">Confirme seu e-mail</h2>
-<p style="color:var(--muted); font-size:15px; line-height:1.5; margin-bottom:6px;">
-Enviamos um link de confirmação para:
-</p>
-<p style="font-weight:700; font-size:16px; margin-bottom:18px;" id="emailConfirmacao"></p>
-<p style="color:var(--muted); font-size:14px; line-height:1.5; margin-bottom:22px;">
-Abra seu e-mail (olhe também a caixa de spam) e clique no link para ativar sua conta. Depois disso, você já pode entrar normalmente.
-</p>
-<button type="button" class="btn btn-ghost btn-block" id="btnReenviar">Reenviar e-mail de confirmação</button>
-<p style="text-align:center; font-size:14px; margin-top:18px;">
-<a href="/login.html" style="color:var(--primary); font-weight:600;">Já confirmei, ir para o login</a>
-</p>
-</div>
+      <div class="field" id="campoBio" style="display:none;">
+        <label for="bio">Quais serviços você oferece?</label>
+        <textarea id="bio" placeholder="Ex: eletricista residencial, instalação de chuveiros e tomadas, 8 anos de experiência"></textarea>
+      </div>
 
-<p style="text-align:center; font-size:14px; color:var(--muted); margin-top:16px;" id="linkLoginBaixo">
-Já tem conta? <a href="/login.html" style="color:var(--primary); font-weight:600;">Entrar</a>
-</p>
-</section>
+      <button type="submit" class="btn btn-primary btn-block" id="btnCadastrar">Criar conta</button>
+    </form>
 
-<footer>
-Grupo Riccieri - 2026
-</footer>
+    <div id="telaConfirmacao" style="display:none; text-align:center; padding:20px 0;">
+      <div style="font-size:44px; margin-bottom:10px;">📩</div>
+      <h2 style="font-size:19px; margin-bottom:10px;">Confirme seu e-mail</h2>
+      <p style="color:var(--muted); font-size:15px; line-height:1.5; margin-bottom:6px;">
+        Enviamos um link de confirmação para:
+      </p>
+      <p style="font-weight:700; font-size:16px; margin-bottom:18px;" id="emailConfirmacao"></p>
+      <p style="color:var(--muted); font-size:14px; line-height:1.5; margin-bottom:22px;">
+        Abra seu e-mail (olhe também a caixa de spam) e clique no link para ativar sua conta. Depois disso, você já pode entrar normalmente.
+      </p>
+      <button type="button" class="btn btn-ghost btn-block" id="btnReenviar">Reenviar e-mail de confirmação</button>
+      <p style="text-align:center; font-size:14px; margin-top:18px;">
+        <a href="/login.html" style="color:var(--primary); font-weight:600;">Já confirmei, ir para o login</a>
+      </p>
+    </div>
+
+    <p style="text-align:center; font-size:14px; color:var(--muted); margin-top:16px;" id="linkLoginBaixo">
+      Já tem conta? <a href="/login.html" style="color:var(--primary); font-weight:600;">Entrar</a>
+    </p>
+  </section>
+
+  <footer>
+    Grupo Riccieri - 2026
+  </footer>
+
 </div>
 
 <script src="config.js"></script>
 <script>
-const params = new URLSearchParams(window.location.search);
-const perfilParam = params.get('perfil');
-const pedidoParam = params.get('pedido');
+  const params = new URLSearchParams(window.location.search);
+  const perfilParam = params.get('perfil');
+  const pedidoParam = params.get('pedido');
 
-if (perfilParam === 'profissional') {
-  document.querySelector('input[value="profissional"]').checked = true;
-}
+  if (perfilParam === 'profissional') {
+    document.querySelector('input[value="profissional"]').checked = true;
+  }
+  atualizaCampoBio();
 
-atualizaCampoBio();
-document.querySelectorAll('input[name="role"]').forEach(r => {
-  r.addEventListener('change', atualizaCampoBio);
-});
+  document.querySelectorAll('input[name="role"]').forEach(r => {
+    r.addEventListener('change', atualizaCampoBio);
+  });
 
-function atualizaCampoBio() {
-  const role = document.querySelector('input[name="role"]:checked').value;
-  document.getElementById('campoBio').style.display = role === 'profissional' ? 'block' : 'none';
-}
+  function atualizaCampoBio() {
+    const role = document.querySelector('input[name="role"]:checked').value;
+    document.getElementById('campoBio').style.display = role === 'profissional' ? 'block' : 'none';
+  }
 
-function mostraMsg(texto, tipo) {
-  document.getElementById('msgBox').innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
-}
+  function mostraMsg(texto, tipo) {
+    document.getElementById('msgBox').innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
+  }
 
-document.getElementById('formCadastro').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const btn = document.getElementById('btnCadastrar');
-  btn.disabled = true;
-  btn.textContent = 'Criando conta...';
+  document.getElementById('formCadastro').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('btnCadastrar');
+    btn.disabled = true;
+    btn.textContent = 'Criando conta...';
 
-  const role = document.querySelector('input[name="role"]:checked').value;
-  const nome = document.getElementById('nome').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const senha = document.getElementById('senha').value;
-  const telefone = document.getElementById('telefone').value.trim();
-  const cidade = document.getElementById('cidade').value.trim();
-  const bio = document.getElementById('bio').value.trim();
+    const role = document.querySelector('input[name="role"]:checked').value;
+    const nome = document.getElementById('nome').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
+    const telefone = document.getElementById('telefone').value.trim();
+    const cpf = document.getElementById('cpf').value.replace(/\D/g, '');
+    const cidade = document.getElementById('cidade').value.trim();
+    const bio = document.getElementById('bio').value.trim();
 
-  const { data, error } = await sb.auth.signUp({
-    email,
-    password: senha,
-    options: {
-      data: { role, nome, telefone, cidade, bio }
+    function cpfValido(cpf) {
+      if (cpf.length !== 11) return false;
+      // Rejeita sequências repetidas (000.000.000-00, 111.111.111-11, etc.)
+      if (/^(\d)\1{10}$/.test(cpf)) return false;
+
+      const calcDigito = (base) => {
+        let soma = 0;
+        for (let i = 0; i < base.length; i++) {
+          soma += parseInt(base[i], 10) * (base.length + 1 - i);
+        }
+        const resto = (soma * 10) % 11;
+        return resto === 10 ? 0 : resto;
+      };
+
+      const digito1 = calcDigito(cpf.slice(0, 9));
+      const digito2 = calcDigito(cpf.slice(0, 9) + digito1);
+      return cpf === cpf.slice(0, 9) + digito1 + digito2;
+    }
+
+    if (!cpfValido(cpf)) {
+      mostraMsg('Digite um CPF válido.', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Criar conta';
+      return;
+    }
+
+    const { data, error } = await sb.auth.signUp({
+      email,
+      password: senha,
+      options: {
+        data: { role, nome, telefone, cpf, cidade, bio }
+      }
+    });
+
+    if (error) {
+      mostraMsg(traduzErro(error.message) + `<br><span style="font-size:12px; opacity:0.75;">(Detalhe técnico: ${error.message})</span>`, 'error');
+      btn.disabled = false;
+      btn.textContent = 'Criar conta';
+      return;
+    }
+
+    // Se a confirmação por e-mail estiver desativada, já existe sessão -> vai direto pro painel
+    if (data.session) {
+      // Reforça a gravação do CPF direto na tabela profiles, caso o gatilho
+      // de cadastro do Supabase ainda não copie esse campo automaticamente.
+      await sb.from('profiles').update({ cpf }).eq('id', data.user.id);
+
+      const destino = pedidoParam
+        ? `/painel.html?novoPedido=${encodeURIComponent(pedidoParam)}`
+        : '/painel.html';
+      window.location.href = destino;
+    } else {
+      mostrarTelaConfirmacao(email);
     }
   });
 
-  if (error) {
-    mostraMsg(traduzErro(error.message) + `<br><span style="font-size:12px; opacity:0.75;">(Detalhe técnico: ${error.message})</span>`, 'error');
-    btn.disabled = false;
-    btn.textContent = 'Criar conta';
-    return;
+  function mostrarTelaConfirmacao(email) {
+    document.getElementById('formCadastro').style.display = 'none';
+    document.getElementById('linkLoginBaixo').style.display = 'none';
+    document.getElementById('emailConfirmacao').textContent = email;
+    document.getElementById('telaConfirmacao').style.display = 'block';
   }
 
-  // Se a confirmação por e-mail estiver desativada, já existe sessão -> vai direto pro painel
-  if (data.session) {
-    const destino = pedidoParam
-      ? `/painel.html?novoPedido=${encodeURIComponent(pedidoParam)}`
-      : '/painel.html';
-    window.location.href = destino;
-  } else {
-    mostrarTelaConfirmacao(email);
+  document.getElementById('btnReenviar').addEventListener('click', async () => {
+    const btnReenviar = document.getElementById('btnReenviar');
+    const email = document.getElementById('emailConfirmacao').textContent;
+
+    btnReenviar.disabled = true;
+    btnReenviar.textContent = 'Reenviando...';
+
+    const { error } = await sb.auth.resend({ type: 'signup', email });
+
+    btnReenviar.disabled = false;
+    btnReenviar.textContent = 'Reenviar e-mail de confirmação';
+
+    if (error) {
+      mostraMsg('Não foi possível reenviar agora. Tente novamente em instantes.', 'error');
+      return;
+    }
+    mostraMsg('E-mail reenviado! Confira sua caixa de entrada.', 'ok');
+  });
+
+  function traduzErro(msg) {
+    if (msg.includes('already registered')) return 'Esse e-mail já está cadastrado. Tente entrar.';
+    if (msg.includes('Password')) return 'A senha precisa ter pelo menos 6 caracteres.';
+    return 'Não foi possível criar a conta. Tente novamente.';
   }
-});
-
-function mostrarTelaConfirmacao(email) {
-  document.getElementById('formCadastro').style.display = 'none';
-  document.getElementById('linkLoginBaixo').style.display = 'none';
-  document.getElementById('emailConfirmacao').textContent = email;
-  document.getElementById('telaConfirmacao').style.display = 'block';
-}
-
-document.getElementById('btnReenviar').addEventListener('click', async () => {
-  const btnReenviar = document.getElementById('btnReenviar');
-  const email = document.getElementById('emailConfirmacao').textContent;
-  btnReenviar.disabled = true;
-  btnReenviar.textContent = 'Reenviando...';
-
-  const { error } = await sb.auth.resend({ type: 'signup', email });
-
-  btnReenviar.disabled = false;
-  btnReenviar.textContent = 'Reenviar e-mail de confirmação';
-
-  if (error) {
-    mostraMsg('Não foi possível reenviar agora. Tente novamente em instantes.', 'error');
-    return;
-  }
-  mostraMsg('E-mail reenviado! Confira sua caixa de entrada.', 'ok');
-});
-
-function traduzErro(msg) {
-  if (msg.includes('already registered')) return 'Esse e-mail já está cadastrado. Tente entrar.';
-  if (msg.includes('Password')) return 'A senha precisa ter pelo menos 6 caracteres.';
-  return 'Não foi possível criar a conta. Tente novamente.';
-}
 </script>
 <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/service-worker.js");
-}
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+  }
 </script>
 </body>
 </html>
