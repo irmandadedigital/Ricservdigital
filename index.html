@@ -6,246 +6,105 @@
 <title>RicServ — Encontre quem resolve</title>
 <link rel="stylesheet" href="ricserv-styles.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Google AdSense: depois de ter sua conta aprovada, remova os comentarios e coloque seu ID de editor -->
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#0A1B38">
+<meta name="theme-color" content="#FF4405">
 </head>
 <body>
 <div class="wrap">
 
-<div class="hero-wrap">
-<div class="top">
-<a href="/index.html" class="brand"><img src="/logo-ricserv-transparente.png" alt="RicServ"></a>
-<nav id="navLoggedOut">
-<a href="/login.html" class="btn btn-primary"><span>👤</span> Entrar</a>
-</nav>
-<nav id="navLoggedIn" style="display:none;">
-<a href="/painel.html" class="btn btn-primary"><span>👤</span> Meu painel</a>
-</nav>
-</div>
+  <div class="top">
+    <a href="/index.html" class="brand">Ric<span>Serv</span></a>
+    <nav id="navLoggedOut">
+      <a href="/login.html" class="btn btn-ghost">Entrar</a>
+    </nav>
+    <nav id="navLoggedIn" style="display:none;">
+      <a href="/painel.html" class="btn btn-primary">Meu painel</a>
+    </nav>
+  </div>
 
-<div class="hero">
-<h1>Encontre o <span class="highlight">profissional certo</span> para o seu serviço.</h1>
-<p class="lede">Mais praticidade, segurança e confiança em um só lugar.</p>
+  <div class="hero">
+    <h1>Diga o que você precisa.<br>A gente te conecta com quem resolve.</h1>
+    <p class="lede">Descreva o serviço em poucas palavras e profissionais da sua região entram em contato com você.</p>
 
-<div class="hero-photo" style="background-image:url('/hero-foto.jpg');">
-<!-- Substitua a imagem de fundo acima por uma foto sua (ou de banco de imagens licenciado) em /hero-foto.jpg -->
-</div>
+    <div class="search-box">
+      <textarea id="pedidoInput" placeholder="Ex: preciso trocar o chuveiro do banheiro amanhã de manhã..."></textarea>
+      <button class="btn btn-primary" id="btnPedir">Pedir</button>
+    </div>
 
-<div class="search-box">
-<textarea id="pedidoInput" placeholder="Ex: preciso trocar o chuveiro do banheiro..."></textarea>
-<button class="btn btn-primary" id="btnPedir">Pedir</button>
-</div>
+    <div class="chips">
+      <span class="chip">eletricista</span>
+      <span class="chip">encanador</span>
+      <span class="chip">diarista</span>
+      <span class="chip">pintor</span>
+      <span class="chip">montador de móveis</span>
+      <span class="chip">reforma</span>
+    </div>
+  </div>
 
-<div class="chips">
-<span class="chip"><span class="icon">🔧</span>eletricista</span>
-<span class="chip"><span class="icon">⚡</span>encanador</span>
-<span class="chip"><span class="icon">🎨</span>pintor</span>
-<span class="chip"><span class="icon">🪛</span>montador de móveis</span>
-<span class="chip"><span class="icon">🧹</span>diarista</span>
-<span class="chip"><span class="icon">🧱</span>reforma</span>
-</div>
 
-<div class="feature-grid">
-<a href="#servicos" class="feature-card">
-<span class="icon-top">👷</span>
-<h3>Preciso de um<br>profissional</h3>
-<p>Encontre alguém para realizar seu serviço.</p>
-<span class="arrow">›</span>
-</a>
-<a href="/cadastro.html?perfil=profissional" class="feature-card">
-<span class="icon-top">🛠️</span>
-<h3>Sou profissional</h3>
-<p>Cadastre seu serviço e alcance mais clientes.</p>
-<span class="arrow">›</span>
-</a>
-</div>
+  <section class="alt">
+    <h2 style="font-size:19px;">Como funciona</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div><strong>Descreva o serviço</strong><p>Conta com suas palavras o que precisa e onde é.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div><strong>Profissionais te respondem</strong><p>Quem atende sua região e o seu tipo de serviço entra em contato.</p></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div><strong>Você escolhe e combina</strong><p>Compare, converse e feche com quem te passar mais confiança.</p></div>
+      </div>
+    </div>
+  </section>
 
-<div class="trust-row">
-<div class="trust-item"><span class="icon">🛡️</span>Seguro</div>
-<div class="trust-item"><span class="icon">⭐</span>Verificado</div>
-<div class="trust-item"><span class="icon">⏱️</span>Rápido</div>
-<div class="trust-item"><span class="icon">💬</span>Suporte</div>
-</div>
-</div>
+  <div class="cta-pro">
+    <h2>É profissional?</h2>
+    <p>Cadastre-se de graça e veja os pedidos de serviço perto de você, na sua área.</p>
+    <a href="/cadastro.html?perfil=profissional" class="btn btn-primary btn-block">Cadastrar como profissional</a>
+  </div>
 
-<div class="wave-divider">
-<svg viewBox="0 0 500 40" preserveAspectRatio="none"><path d="M0,20 C150,45 350,-5 500,20 L500,40 L0,40 Z" fill="#FFB800"></path></svg>
-</div>
-</div>
 
-<div class="ad-slot">[ Espaço reservado para anúncio — Banner ]</div>
+  <footer>
+    <a href="/sobre.html">Sobre</a> · <a href="/privacidade.html">Política de Privacidade</a><br>
+    Grupo Riccieri - 2026
+  </footer>
 
-<section id="servicos">
-<h2 style="font-size:19px; margin-bottom:4px;">Serviços mais procurados</h2>
-<p style="color:var(--muted); font-size:14px; margin:0 0 4px;">Toque numa categoria pra já começar seu pedido.</p>
-
-<div class="cat-block" style="margin-top:16px;">
-<h3>Casa e reparos</h3>
-<div class="cat-grid">
-<button type="button" class="cat-tile" data-cat="eletricista"><span class="emoji">⚡</span>Eletricista</button>
-<button type="button" class="cat-tile" data-cat="encanador"><span class="emoji">🔧</span>Encanador</button>
-<button type="button" class="cat-tile" data-cat="pintor"><span class="emoji">🎨</span>Pintor</button>
-<button type="button" class="cat-tile" data-cat="montador de móveis"><span class="emoji">🪑</span>Montador</button>
-</div>
-</div>
-
-<div class="cat-block">
-<h3>Limpeza</h3>
-<div class="cat-grid">
-<button type="button" class="cat-tile" data-cat="diarista"><span class="emoji">🧹</span>Diarista</button>
-<button type="button" class="cat-tile" data-cat="limpeza de estofados"><span class="emoji">🛋️</span>Estofados</button>
-</div>
-</div>
-
-<div class="cat-block">
-<h3>Outros</h3>
-<div class="cat-grid">
-<button type="button" class="cat-tile" data-cat="jardinagem"><span class="emoji">🌱</span>Jardinagem</button>
-<button type="button" class="cat-tile" id="btnVerTudo"><span class="emoji">•••</span>Ver tudo</button>
-</div>
-</div>
-
-<div class="cat-block" id="blocoMaisServicos" style="display:none;">
-<h3>Mais serviços</h3>
-<div class="cat-grid">
-<button type="button" class="cat-tile" data-cat="pedreiro"><span class="emoji">🧱</span>Pedreiro</button>
-<button type="button" class="cat-tile" data-cat="gesseiro"><span class="emoji">🏠</span>Gesseiro</button>
-<button type="button" class="cat-tile" data-cat="técnico de ar condicionado"><span class="emoji">❄️</span>Ar condicionado</button>
-<button type="button" class="cat-tile" data-cat="chaveiro"><span class="emoji">🔑</span>Chaveiro</button>
-<button type="button" class="cat-tile" data-cat="marido de aluguel"><span class="emoji">🛠️</span>Marido de aluguel</button>
-<button type="button" class="cat-tile" data-cat="dedetizador"><span class="emoji">🐜</span>Dedetização</button>
-<button type="button" class="cat-tile" data-cat="frete e mudança"><span class="emoji">🚚</span>Frete e mudança</button>
-<button type="button" class="cat-tile" data-cat="costureira"><span class="emoji">🧵</span>Costureira</button>
-<button type="button" class="cat-tile" data-cat="cuidador de idosos"><span class="emoji">🤝</span>Cuidador(a)</button>
-<button type="button" class="cat-tile" data-cat="personal trainer"><span class="emoji">🏋️</span>Personal trainer</button>
-<button type="button" class="cat-tile" data-cat="professor particular"><span class="emoji">📚</span>Professor(a)</button>
-<button type="button" class="cat-tile" data-cat="manicure"><span class="emoji">💅</span>Manicure</button>
-</div>
-</div>
-</section>
-
-<section class="alt">
-<h2 style="font-size:19px;">Como funciona</h2>
-<div class="steps">
-<div class="step">
-<div class="step-num">1</div>
-<div><strong>Descreva o serviço</strong><p>Conta com suas palavras o que precisa e onde é.</p></div>
-</div>
-<div class="step">
-<div class="step-num">2</div>
-<div><strong>Profissionais te respondem</strong><p>Quem atende sua região e o seu tipo de serviço entra em contato.</p></div>
-</div>
-<div class="step">
-<div class="step-num">3</div>
-<div><strong>Você escolhe e combina</strong><p>Compare, converse e feche com quem te passar mais confiança.</p></div>
-</div>
-</div>
-</section>
-
-<section>
-<h2 style="font-size:19px;">O que dizem quem já usou</h2>
-<div class="testi">
-<div class="testi-card">
-<div class="testi-stars">★★★★★</div>
-<p class="testi-text">Pedi um eletricista de manhã e no mesmo dia já tinha três orçamentos. Rápido e sem enrolação.</p>
-<div class="testi-autor">Camila R. — Moema, São Paulo</div>
-</div>
-<div class="testi-card">
-<div class="testi-stars">★★★★★</div>
-<p class="testi-text">Gostei de poder descrever o problema com minhas palavras, sem precisar preencher formulário enorme.</p>
-<div class="testi-autor">Marcos T. — Suzano</div>
-</div>
-<div class="testi-card">
-<div class="testi-stars">★★★★☆</div>
-<p class="testi-text">Como profissional, o que mais gosto é não pagar mensalidade — só uso moedas quando realmente vale a pena.</p>
-<div class="testi-autor">João P. — Eletricista, Selo RicServ</div>
-</div>
-</div>
-</section>
-
-<div class="cta-pro">
-<h2>É profissional?</h2>
-<p>Cadastre-se de graça e veja os pedidos de serviço perto de você, na sua área.</p>
-<a href="/cadastro.html?perfil=profissional" class="btn btn-primary btn-block">Cadastrar como profissional</a>
-</div>
-
-<div class="ad-slot">[ Espaço reservado para anúncio — In-feed ]</div>
-
-<section class="alt">
-<h2 style="font-size:19px;">Perguntas frequentes</h2>
-<div class="faq">
-<details>
-<summary>É grátis pedir um serviço?</summary>
-<p>Sim. Publicar seu pedido não custa nada — você só combina o valor do serviço direto com o profissional.</p>
-</details>
-<details>
-<summary>Quanto tempo leva pra alguém responder?</summary>
-<p>Varia por região e categoria, mas a maioria dos pedidos recebe o primeiro contato em poucos minutos a algumas horas.</p>
-</details>
-<details>
-<summary>Como sei que o profissional é de confiança?</summary>
-<p>Fique atento ao Selo RicServ ✓ — ele indica que o profissional passou por verificação de documento. Você também pode ver a avaliação de outros clientes.</p>
-</details>
-<details>
-<summary>Posso usar o RicServ pra oferecer meus serviços?</summary>
-<p>Sim! O cadastro de profissional é gratuito, sem mensalidade — você só usa moedas quando decide liberar o contato de um cliente.</p>
-</details>
-</div>
-</section>
-
-<footer>
-<a href="/sobre.html">Sobre</a> · <a href="/privacidade.html">Política de Privacidade</a><br>
-Grupo Riccieri - 2026
-</footer>
 </div>
 
 <script src="config.js"></script>
 <script>
-async function checkSession() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    document.getElementById('navLoggedOut').style.display = 'none';
-    document.getElementById('navLoggedIn').style.display = 'flex';
+  // Verifica se já existe sessão ativa e ajusta o menu do topo
+  async function checkSession() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      document.getElementById('navLoggedOut').style.display = 'none';
+      document.getElementById('navLoggedIn').style.display = 'flex';
+    }
   }
-}
-checkSession();
+  checkSession();
 
-document.getElementById('btnPedir').addEventListener('click', async () => {
-  const texto = document.getElementById('pedidoInput').value.trim();
-  const { data: { session } } = await sb.auth.getSession();
-  if (!texto) {
-    document.getElementById('pedidoInput').focus();
-    return;
-  }
-  const destino = session
-    ? `/painel.html?novoPedido=${encodeURIComponent(texto)}`
-    : `/cadastro.html?perfil=cliente&pedido=${encodeURIComponent(texto)}`;
-  window.location.href = destino;
-});
-
-document.querySelectorAll('.cat-tile[data-cat]').forEach(tile => {
-  tile.addEventListener('click', () => {
-    const campo = document.getElementById('pedidoInput');
-    campo.value = `Preciso de um ${tile.dataset.cat}: `;
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setTimeout(() => { campo.focus(); campo.setSelectionRange(campo.value.length, campo.value.length); }, 400);
+  // Ao pedir um serviço, leva para o cadastro (ou painel, se já logado) com o texto preenchido
+  document.getElementById('btnPedir').addEventListener('click', async () => {
+    const texto = document.getElementById('pedidoInput').value.trim();
+    const { data: { session } } = await sb.auth.getSession();
+    if (!texto) {
+      document.getElementById('pedidoInput').focus();
+      return;
+    }
+    const destino = session
+      ? `/painel.html?novoPedido=${encodeURIComponent(texto)}`
+      : `/cadastro.html?perfil=cliente&pedido=${encodeURIComponent(texto)}`;
+    window.location.href = destino;
   });
-});
-
-document.getElementById('btnVerTudo').addEventListener('click', function () {
-  const bloco = document.getElementById('blocoMaisServicos');
-  const abrindo = bloco.style.display === 'none';
-  bloco.style.display = abrindo ? 'block' : 'none';
-  this.innerHTML = abrindo
-    ? '<span class="emoji">▲</span>Ver menos'
-    : '<span class="emoji">•••</span>Ver tudo';
-  if (abrindo) bloco.scrollIntoView({ behavior: 'smooth', block: 'start' });
-});
 </script>
 <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/service-worker.js");
-}
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+  }
 </script>
 </body>
 </html>
