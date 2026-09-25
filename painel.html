@@ -6,382 +6,317 @@
 <title>Meu painel — RicServ</title>
 <link rel="stylesheet" href="ricserv-styles.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Google AdSense: depois de ter sua conta aprovada, remova os comentarios e coloque seu ID de editor -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#FF4405">
-<style>
-.contato-liberado {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.btn-whatsapp {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: #25D366;
-  color: #fff;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-  padding: 8px 14px;
-  border-radius: 999px;
-  white-space: nowrap;
-}
-.selo-ricserv {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 11px;
-  background: linear-gradient(135deg, #FFD700, #FFA500);
-  color: #222;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-weight: 700;
-  vertical-align: middle;
-  margin-left: 8px;
-}
-.card-completar-perfil {
-  border: 2px solid #FFD700;
-  margin-bottom: 16px;
-}
-</style>
 </head>
 <body>
 <div class="wrap">
-<div class="top">
-<a href="/index.html" class="brand">Ric<span>Serv</span></a>
-<button class="btn btn-ghost" id="btnSair">Sair</button>
-</div>
 
-<section style="padding-top:0;">
-
-<div id="saudacao" style="margin-bottom:16px;">
-<h1 style="font-size:20px;">Carregando...</h1>
-</div>
-
-<div id="msgBox"></div>
-
-<!-- ===== Complete seu perfil / Selo RicServ ===== -->
-<div class="card card-completar-perfil" id="cardCompletarPerfil" style="display:none;">
-  <div class="card-title" style="margin-bottom:6px;">🏅 Complete seu perfil e ganhe o Selo RicServ</div>
-  <p style="font-size:13px; color:var(--muted); margin:0 0 12px;">
-    Informe seu CPF para ativar o selo de verificação e transmitir mais confiança na plataforma.
-  </p>
-  <div class="field">
-    <label for="cpfPerfil">CPF</label>
-    <input type="text" id="cpfPerfil" inputmode="numeric" placeholder="000.000.000-00" maxlength="14">
+  <div class="top">
+    <a href="/index.html" class="brand">Ric<span>Serv</span></a>
+    <button class="btn btn-ghost" id="btnSair">Sair</button>
   </div>
-  <button type="button" class="btn btn-primary btn-block" id="btnSalvarCpf">Ativar Selo RicServ</button>
-  <div id="msgCpf" style="margin-top:8px;"></div>
-</div>
 
-<!-- ===== Visão do CLIENTE ===== -->
-<div id="painelCliente" style="display:none;">
-<div class="card">
-<div class="card-title" style="margin-bottom:10px;">Novo pedido de serviço</div>
-<form id="formPedido">
-<div class="field">
-<label for="titulo">O que você precisa? (título curto)</label>
-<input type="text" id="titulo" placeholder="Ex: Instalar chuveiro elétrico" required>
-</div>
-<div class="field">
-<label for="descricao">Detalhes</label>
-<textarea id="descricao" placeholder="Descreva o serviço, urgência, etc." required></textarea>
-</div>
-<div class="field">
-<label for="cidade">Cidade</label>
-<input type="text" id="cidade" required>
-</div>
-<button type="submit" class="btn btn-primary btn-block">Publicar pedido</button>
-</form>
-</div>
+  <section style="padding-top:0;">
+    <div id="saudacao" style="margin-bottom:16px;">
+      <h1 style="font-size:20px;">Carregando...</h1>
+    </div>
 
-<h2 style="font-size:16px; margin: 24px 0 12px;">Meus pedidos</h2>
-<div id="listaMeusPedidos"></div>
-</div>
+    <div id="msgBox"></div>
 
-<!-- ===== Visão do PROFISSIONAL ===== -->
-<div id="painelProfissional" style="display:none;">
-<div class="card" style="display:flex; align-items:center; justify-content:space-between;">
-<div>
-<div class="card-meta" style="margin-bottom:2px;">Seu saldo</div>
-<div class="card-title" id="saldoMoedas" style="font-size:20px;">— moedas</div>
-</div>
-<a href="/comprar-moedas.html" class="btn btn-primary">Comprar moedas</a>
-</div>
+    <!-- ===== Visão do CLIENTE ===== -->
+    <div id="painelCliente" style="display:none;">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:10px;">Novo pedido de serviço</div>
+        <form id="formPedido">
+          <div class="field">
+            <label for="titulo">O que você precisa? (título curto)</label>
+            <input type="text" id="titulo" placeholder="Ex: Instalar chuveiro elétrico" required>
+          </div>
+          <div class="field">
+            <label for="descricao">Detalhes</label>
+            <textarea id="descricao" placeholder="Descreva o serviço, urgência, etc." required></textarea>
+          </div>
+          <div class="field">
+            <label for="cidade">Cidade</label>
+            <input type="text" id="cidade" required>
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Publicar pedido</button>
+        </form>
+      </div>
 
-<h2 style="font-size:16px; margin:20px 0 12px;">Pedidos em aberto</h2>
-<p style="font-size:12px; color:var(--muted); margin:-6px 0 14px;">Liberar o contato de um cliente custa 10 moedas.</p>
-<div id="listaPedidosAbertos"></div>
-</div>
+      <h2 style="font-size:16px; margin: 24px 0 12px;">Meus pedidos</h2>
+      <div id="listaMeusPedidos"></div>
+    </div>
 
-</section>
+    <!-- ===== Visão do PROFISSIONAL ===== -->
+    <div id="painelProfissional" style="display:none;">
+      <h2 style="font-size:16px; margin:0 0 12px;">Pedidos em aberto</h2>
+      <p style="font-size:12px; color:var(--muted); margin:-6px 0 14px;"><strong>Liberar o contato do cliente custa R$ 9,90</strong> — pague só pelos contatos que você quiser, sem pacotes.</p>
+      <div id="listaPedidosAbertos"></div>
+    </div>
+  </section>
 
-<div class="ad-slot">[ Espaço reservado para anúncio — Painel ]</div>
 
-<footer>
-Grupo Riccieri - 2026
-</footer>
+  <footer>
+    Grupo Riccieri - 2026
+  </footer>
+
 </div>
 
 <script src="config.js"></script>
 <script>
-let perfilAtual = null;
+  let perfilAtual = null;
 
-async function init() {
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) {
-    window.location.href = '/login.html';
-    return;
-  }
-
-  const { data: perfil, error } = await sb
-    .from('profiles')
-    .select('*')
-    .eq('id', session.user.id)
-    .single();
-
-  if (error || !perfil) {
-    mostraMsg('Não foi possível carregar seu perfil. Tente sair e entrar novamente.', 'error');
-    return;
-  }
-
-  perfilAtual = perfil;
-
-  const seloHtml = perfil.cpf
-    ? '<span class="selo-ricserv">🏅 Selo RicServ</span>'
-    : '';
-  document.getElementById('saudacao').innerHTML = `<h1 style="font-size:20px;">Olá, ${perfil.nome.split(' ')[0]}${seloHtml}</h1>`;
-
-  if (!perfil.cpf) {
-    document.getElementById('cardCompletarPerfil').style.display = 'block';
-  }
-
-  if (perfil.role === 'cliente') {
-    document.getElementById('painelCliente').style.display = 'block';
-    preencherPedidoDaBusca();
-    carregarMeusPedidos();
-  } else {
-    document.getElementById('painelProfissional').style.display = 'block';
-    document.getElementById('saldoMoedas').textContent = `${perfil.saldo_moedas} moedas`;
-    carregarPedidosAbertos();
-  }
-}
-
-function mostraMsg(texto, tipo) {
-  document.getElementById('msgBox').innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
-}
-
-// ===== Completar perfil / Selo RicServ =====
-function cpfValido(cpf) {
-  if (cpf.length !== 11) return false;
-  if (/^(\d)\1{10}$/.test(cpf)) return false;
-  const calcDigito = (base) => {
-    let soma = 0;
-    for (let i = 0; i < base.length; i++) {
-      soma += parseInt(base[i], 10) * (base.length + 1 - i);
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) {
+      window.location.href = '/login.html';
+      return;
     }
-    const resto = (soma * 10) % 11;
-    return resto === 10 ? 0 : resto;
-  };
-  const digito1 = calcDigito(cpf.slice(0, 9));
-  const digito2 = calcDigito(cpf.slice(0, 9) + digito1);
-  return cpf === cpf.slice(0, 9) + digito1 + digito2;
-}
 
-document.getElementById('btnSalvarCpf').addEventListener('click', async () => {
-  const btn = document.getElementById('btnSalvarCpf');
-  const msgCpf = document.getElementById('msgCpf');
-  const cpf = document.getElementById('cpfPerfil').value.replace(/\D/g, '');
+    const { data: perfil, error } = await sb
+      .from('profiles')
+      .select('*')
+      .eq('id', session.user.id)
+      .single();
 
-  if (!cpfValido(cpf)) {
-    msgCpf.innerHTML = '<div class="msg error" style="margin:0;">Digite um CPF válido.</div>';
-    return;
+    if (error || !perfil) {
+      mostraMsg('Não foi possível carregar seu perfil. Tente sair e entrar novamente.', 'error');
+      return;
+    }
+
+    perfilAtual = perfil;
+    document.getElementById('saudacao').innerHTML = `<h1 style="font-size:20px;">Olá, ${perfil.nome.split(' ')[0]}</h1>`;
+
+    if (perfil.role === 'cliente') {
+      document.getElementById('painelCliente').style.display = 'block';
+      preencherPedidoDaBusca();
+      carregarMeusPedidos();
+    } else {
+      document.getElementById('painelProfissional').style.display = 'block';
+      carregarPedidosAbertos();
+
+      // Se voltou de um checkout de liberação de contato, confirma e revela.
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('checkout') === 'retorno' && params.get('request_id')) {
+        mostraMsg('Confirmando seu pagamento...', 'ok');
+        iniciarPolling(params.get('request_id'));
+        window.history.replaceState({}, '', '/painel.html');
+      }
+    }
   }
 
-  btn.disabled = true;
-  btn.textContent = 'Salvando...';
-
-  const { error } = await sb.from('profiles').update({ cpf }).eq('id', perfilAtual.id);
-
-  btn.disabled = false;
-  btn.textContent = 'Ativar Selo RicServ';
-
-  if (error) {
-    msgCpf.innerHTML = '<div class="msg error" style="margin:0;">Não foi possível salvar. Tente novamente.</div>';
-    return;
+  function mostraMsg(texto, tipo) {
+    document.getElementById('msgBox').innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
   }
 
-  perfilAtual.cpf = cpf;
-  document.getElementById('cardCompletarPerfil').style.display = 'none';
-  const seloHtml = '<span class="selo-ricserv">🏅 Selo RicServ</span>';
-  document.getElementById('saudacao').innerHTML = `<h1 style="font-size:20px;">Olá, ${perfilAtual.nome.split(' ')[0]}${seloHtml}</h1>`;
-  mostraMsg('Selo RicServ ativado! 🎉', 'ok');
-});
-
-// Se veio da busca da home ("Pedir"), já preenche o formulário
-function preencherPedidoDaBusca() {
-  const params = new URLSearchParams(window.location.search);
-  const texto = params.get('novoPedido');
-  if (texto) {
-    document.getElementById('descricao').value = texto;
-    document.getElementById('titulo').value = texto.slice(0, 60);
-    document.getElementById('cidade').value = perfilAtual.cidade || '';
+  // Se veio da busca da home ("Pedir"), já preenche o formulário
+  function preencherPedidoDaBusca() {
+    const params = new URLSearchParams(window.location.search);
+    const texto = params.get('novoPedido');
+    if (texto) {
+      document.getElementById('descricao').value = texto;
+      document.getElementById('titulo').value = texto.slice(0, 60);
+      document.getElementById('cidade').value = perfilAtual.cidade || '';
+    }
   }
-}
 
-document.getElementById('formPedido').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const titulo = document.getElementById('titulo').value.trim();
-  const descricao = document.getElementById('descricao').value.trim();
-  const cidade = document.getElementById('cidade').value.trim();
+  document.getElementById('formPedido').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const titulo = document.getElementById('titulo').value.trim();
+    const descricao = document.getElementById('descricao').value.trim();
+    const cidade = document.getElementById('cidade').value.trim();
 
-  const { error } = await sb.from('service_requests').insert({
-    client_id: perfilAtual.id,
-    titulo, descricao, cidade
+    const { error } = await sb.from('service_requests').insert({
+      client_id: perfilAtual.id,
+      titulo, descricao, cidade
+    });
+
+    if (error) {
+      mostraMsg('Não foi possível publicar o pedido. Tente novamente.', 'error');
+      return;
+    }
+
+    document.getElementById('formPedido').reset();
+    mostraMsg('Pedido publicado! Profissionais da sua região já podem ver.', 'ok');
+    carregarMeusPedidos();
   });
 
-  if (error) {
-    mostraMsg('Não foi possível publicar o pedido. Tente novamente.', 'error');
-    return;
-  }
+  async function carregarMeusPedidos() {
+    const { data, error } = await sb
+      .from('service_requests')
+      .select('*')
+      .eq('client_id', perfilAtual.id)
+      .order('created_at', { ascending: false });
 
-  document.getElementById('formPedido').reset();
-  mostraMsg('Pedido publicado! Profissionais da sua região já podem ver.', 'ok');
-  carregarMeusPedidos();
-});
+    const container = document.getElementById('listaMeusPedidos');
+    if (error) { container.innerHTML = '<div class="empty-state">Erro ao carregar pedidos.</div>'; return; }
+    if (!data.length) { container.innerHTML = '<div class="empty-state">Você ainda não publicou nenhum pedido.</div>'; return; }
 
-async function carregarMeusPedidos() {
-  const { data, error } = await sb
-    .from('service_requests')
-    .select('*')
-    .eq('client_id', perfilAtual.id)
-    .order('created_at', { ascending: false });
-
-  const container = document.getElementById('listaMeusPedidos');
-  if (error) { container.innerHTML = '<div class="empty-state">Erro ao carregar pedidos.</div>'; return; }
-  if (!data.length) { container.innerHTML = '<div class="empty-state">Você ainda não publicou nenhum pedido.</div>'; return; }
-
-  container.innerHTML = data.map(p => `
-    <div class="card">
-      <span class="badge ${p.status !== 'aberto' ? 'warn' : ''}">${p.status}</span>
-      <div class="card-title" style="margin-top:8px;">${escapeHtml(p.titulo)}</div>
-      <div class="card-meta">${escapeHtml(p.cidade || '')} · ${formataData(p.created_at)}</div>
-      <div class="card-desc">${escapeHtml(p.descricao)}</div>
-    </div>
-  `).join('');
-}
-
-let contatosLiberadosCache = {};
-
-async function carregarPedidosAbertos() {
-  const { data, error } = await sb
-    .from('service_requests')
-    .select('*')
-    .eq('status', 'aberto')
-    .order('created_at', { ascending: false });
-
-  const container = document.getElementById('listaPedidosAbertos');
-  if (error) { container.innerHTML = '<div class="empty-state">Erro ao carregar pedidos.</div>'; return; }
-  if (!data.length) { container.innerHTML = '<div class="empty-state">Nenhum pedido em aberto no momento. Volte mais tarde!</div>'; return; }
-
-  const { data: liberados } = await sb
-    .from('contatos_liberados')
-    .select('request_id')
-    .eq('profissional_id', perfilAtual.id);
-
-  const idsLiberados = new Set((liberados || []).map(l => l.request_id));
-
-  container.innerHTML = data.map(p => renderCardPedido(p, idsLiberados.has(p.id))).join('');
-
-  idsLiberados.forEach(async (id) => {
-    if (data.some(p => p.id === id)) await revelarContato(id, false);
-  });
-
-  document.querySelectorAll('.btn-liberar').forEach(btn => {
-    btn.addEventListener('click', () => revelarContato(btn.dataset.id, true));
-  });
-}
-
-function renderCardPedido(p, jaLiberado) {
-  return `
-    <div class="card" id="card-${p.id}">
-      <div class="card-title">${escapeHtml(p.titulo)}</div>
-      <div class="card-meta">${escapeHtml(p.cidade || '')} · ${formataData(p.created_at)}</div>
-      <div class="card-desc">${escapeHtml(p.descricao)}</div>
-      <div id="contato-${p.id}">
-        ${jaLiberado
-          ? '<div style="font-size:13px; color:var(--muted);">Carregando contato...</div>'
-          : `<button class="btn btn-primary btn-liberar" data-id="${p.id}">Liberar contato (10 moedas)</button>`
-        }
+    container.innerHTML = data.map(p => `
+      <div class="card">
+        <span class="badge ${p.status !== 'aberto' ? 'warn' : ''}">${p.status}</span>
+        <div class="card-title" style="margin-top:8px;">${escapeHtml(p.titulo)}</div>
+        <div class="card-meta">${escapeHtml(p.cidade || '')} · ${formataData(p.created_at)}</div>
+        <div class="card-desc">${escapeHtml(p.descricao)}</div>
       </div>
-    </div>
-  `;
-}
-
-async function revelarContato(requestId, cobrar) {
-  const alvo = document.getElementById(`contato-${requestId}`);
-  if (cobrar && alvo) alvo.innerHTML = '<div style="font-size:13px; color:var(--muted);">Liberando...</div>';
-
-  const { data, error } = await sb.rpc('liberar_contato', { p_request_id: requestId, p_custo: 10 });
-
-  if (error) {
-    if (alvo) alvo.innerHTML = `<div class="msg error" style="margin:0;">${error.message.includes('insuficiente') ? 'Saldo de moedas insuficiente.' : 'Não foi possível liberar o contato.'}</div>`;
-    return;
+    `).join('');
   }
 
-  const contato = data[0];
-  if (alvo) {
-    const zap = linkWhatsApp(contato.telefone);
-    alvo.innerHTML = `
-      <div class="contato-liberado">
-        <div style="font-size:13px; color:var(--confirm); font-weight:600;">Contato: ${escapeHtml(contato.nome)} — ${escapeHtml(contato.telefone || 'não informado')}</div>
-        ${zap ? `<a href="${zap}" target="_blank" rel="noopener" class="btn-whatsapp">📱 WhatsApp</a>` : ''}
+  async function carregarPedidosAbertos() {
+    const { data, error } = await sb
+      .from('service_requests')
+      .select('*')
+      .eq('status', 'aberto')
+      .order('created_at', { ascending: false });
+
+    const container = document.getElementById('listaPedidosAbertos');
+    if (error) { container.innerHTML = '<div class="empty-state">Erro ao carregar pedidos.</div>'; return; }
+    if (!data.length) { container.innerHTML = '<div class="empty-state">Nenhum pedido em aberto no momento. Volte mais tarde!</div>'; return; }
+
+    // Nome do cliente aparece de graça; telefone só depois de liberar.
+    const idsPedidos = data.map(p => p.id);
+    const { data: nomes } = await sb.rpc('nomes_clientes_pedidos', { p_request_ids: idsPedidos });
+    const nomeMap = {};
+    (nomes || []).forEach(n => { nomeMap[n.request_id] = n.nome; });
+
+    // Descobre quais pedidos esse profissional já pagou antes.
+    const { data: liberados } = await sb
+      .from('contatos_liberados')
+      .select('request_id')
+      .eq('profissional_id', perfilAtual.id);
+    const idsLiberados = new Set((liberados || []).map(l => l.request_id));
+
+    container.innerHTML = data.map(p => renderCardPedido(p, idsLiberados.has(p.id), nomeMap[p.id])).join('');
+
+    // Para os já liberados, busca o contato pra exibir direto (sem cobrar de novo).
+    idsLiberados.forEach(async (id) => {
+      if (data.some(p => p.id === id)) await revelarContatoJaLiberado(id);
+    });
+
+    document.querySelectorAll('.btn-liberar').forEach(btn => {
+      btn.addEventListener('click', () => iniciarCheckoutLiberacao(btn.dataset.id));
+    });
+  }
+
+  function renderCardPedido(p, jaLiberado, nomeCliente) {
+    const primeiroNome = (nomeCliente || 'Cliente').trim().split(' ')[0];
+    return `
+      <div class="card" id="card-${p.id}">
+        <div class="card-title">${escapeHtml(p.titulo)}</div>
+        <div class="card-meta">${escapeHtml(p.cidade || '')} · ${formataData(p.created_at)}</div>
+        <div class="card-desc">${escapeHtml(p.descricao)}</div>
+        <div style="font-size:13px; color:var(--muted); margin:8px 0;">Cliente: <strong>${escapeHtml(primeiroNome)}</strong> · telefone oculto</div>
+        <div id="contato-${p.id}">
+          ${jaLiberado
+            ? '<div style="font-size:13px; color:var(--muted);">Carregando contato...</div>'
+            : `<button class="btn btn-primary btn-liberar" data-id="${p.id}"><strong>Liberar contato (R$ 9,90)</strong></button>`
+          }
+        </div>
       </div>
     `;
   }
 
-  if (cobrar) {
-    const { data: perfilAtualizado } = await sb.from('profiles').select('saldo_moedas').eq('id', perfilAtual.id).single();
-    if (perfilAtualizado) {
-      perfilAtual.saldo_moedas = perfilAtualizado.saldo_moedas;
-      document.getElementById('saldoMoedas').textContent = `${perfilAtualizado.saldo_moedas} moedas`;
+  async function revelarContatoJaLiberado(requestId) {
+    const alvo = document.getElementById(`contato-${requestId}`);
+    const { data, error } = await sb.rpc('obter_contato_liberado', { p_request_id: requestId });
+    if (error || !data || !data[0]) {
+      if (alvo) alvo.innerHTML = '<div style="font-size:13px; color:var(--muted);">Não foi possível carregar o contato.</div>';
+      return;
+    }
+    const contato = data[0];
+    if (alvo) {
+      alvo.innerHTML = `<div style="font-size:13px; color:var(--confirm); font-weight:600;">Contato: ${escapeHtml(contato.nome)} — ${escapeHtml(contato.telefone || 'não informado')}</div>`;
     }
   }
-}
 
-function formataData(iso) {
-  const d = new Date(iso);
-  return d.toLocaleDateString('pt-BR');
-}
+  async function iniciarCheckoutLiberacao(requestId) {
+    const alvo = document.getElementById(`contato-${requestId}`);
+    if (alvo) alvo.innerHTML = '<div style="font-size:13px; color:var(--muted);">Preparando pagamento...</div>';
 
-function escapeHtml(str) {
-  const div = document.createElement('div');
-  div.textContent = str || '';
-  return div.innerHTML;
-}
+    try {
+      const { data: { session } } = await sb.auth.getSession();
+      const resp = await fetch('/api/criar-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ requestId }),
+      });
+      const dados = await resp.json();
 
-function linkWhatsApp(telefone) {
-  if (!telefone) return null;
-  const numeros = telefone.replace(/\D/g, '');
-  if (!numeros) return null;
-  const comCodigoPais = numeros.startsWith('55') ? numeros : `55${numeros}`;
-  return `https://wa.me/${comCodigoPais}`;
-}
+      if (!resp.ok) {
+        const detalhesTexto = dados.detalhes ? ` — ${JSON.stringify(dados.detalhes)}` : '';
+        if (alvo) alvo.innerHTML = `<div class="msg error" style="margin:0;">${(dados.erro || 'Não foi possível gerar a cobrança.') + detalhesTexto}</div>`;
+        return;
+      }
 
-document.getElementById('btnSair').addEventListener('click', async () => {
-  await sb.auth.signOut();
-  window.location.href = '/index.html';
-});
+      if (dados.jaLiberado) {
+        // Já tinha pago antes (ex: dois cliques rápidos) — só revela.
+        await revelarContatoJaLiberado(requestId);
+        return;
+      }
 
-init();
+      window.open(dados.checkoutUrl, '_blank');
+      if (alvo) alvo.innerHTML = `
+        <div style="font-size:13px; color:var(--muted); margin-bottom:6px;">Pagamento aberto em outra aba. Volte aqui depois de pagar.</div>
+        <button class="btn btn-block btn-reabrir" data-url="${dados.checkoutUrl}" style="margin-bottom:6px;">Reabrir a página de pagamento</button>
+      `;
+      const btnReabrir = alvo.querySelector('.btn-reabrir');
+      if (btnReabrir) {
+        btnReabrir.addEventListener('click', () => window.open(btnReabrir.dataset.url, '_blank'));
+      }
+      iniciarPolling(requestId);
+    } catch (e) {
+      if (alvo) alvo.innerHTML = `<div class="msg error" style="margin:0;">${e.message || 'Erro de conexão. Tente novamente.'}</div>`;
+    }
+  }
+
+  const pollingsAtivos = {};
+
+  function iniciarPolling(requestId) {
+    if (pollingsAtivos[requestId]) return; // já tem um rodando pra esse pedido
+    pollingsAtivos[requestId] = setInterval(async () => {
+      const { data } = await sb
+        .from('contatos_liberados')
+        .select('request_id')
+        .eq('profissional_id', perfilAtual.id)
+        .eq('request_id', requestId)
+        .maybeSingle();
+
+      if (data) {
+        clearInterval(pollingsAtivos[requestId]);
+        delete pollingsAtivos[requestId];
+        await revelarContatoJaLiberado(requestId);
+      }
+    }, 4000);
+  }
+
+  function formataData(iso) {
+    const d = new Date(iso);
+    return d.toLocaleDateString('pt-BR');
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str || '';
+    return div.innerHTML;
+  }
+
+  document.getElementById('btnSair').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    window.location.href = '/index.html';
+  });
+
+  init();
 </script>
 <script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("/service-worker.js");
-}
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/service-worker.js");
+  }
 </script>
 </body>
 </html>
