@@ -3,16 +3,12 @@
 // Cria um link de Checkout da InfinitePay (página hospedada por eles, com
 // Pix e cartão juntos) e devolve a URL pra abrir numa nova aba.
 //
-// O valor NUNCA vem do navegador — é sempre resolvido aqui a partir de
-// PACOTES, pra ninguém conseguir forjar um valor menor.
+// Modelo atual: o profissional paga um valor fixo pra liberar o contato
+// de UM pedido específico (requestId) — não é mais compra de pacote de
+// moedas. O valor NUNCA vem do navegador — é sempre o valor fixo abaixo,
+// pra ninguém conseguir forjar um valor menor.
 
-const PACOTES = {
-  teste: { quantidade: 10, valorReais: 10.0 },
-  inicial: { quantidade: 10, valorReais: 9.9 },
-  bronze: { quantidade: 20, valorReais: 20.0 },
-  prata: { quantidade: 40, valorReais: 35.0 },
-  ouro: { quantidade: 80, valorReais: 70.0 },
-};
+const VALOR_LIBERACAO_REAIS = 9.9;
 
 function jsonResponse(status, body) {
   return new Response(JSON.stringify(body), {
@@ -40,7 +36,35 @@ async function buscarPerfil(env, userId) {
   return rows[0] || null;
 }
 
-async function criarSolicitacao(env, { profissionalId, quantidade, valorReais, referenciaId }) {
+async function buscarPedido(env, requestId) {
+  const resp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/service_requests?id=eq.${encodeURIComponent(requestId)}&select=id,status`,
+    {
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      },
+    }
+  );
+  const rows = await resp.json();
+  return rows[0] || null;
+}
+
+async function jaLiberado(env, profissionalId, requestId) {
+  const resp = await fetch(
+    `${env.SUPABASE_URL}/rest/v1/contatos_liberados?profissional_id=eq.${profissionalId}&request_id=eq.${requestId}&select=request_id`,
+    {
+      headers: {
+        apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+      },
+    }
+  );
+  const rows = await resp.json();
+  return rows.length > 0;
+}
+
+async function criarSolicitacao(env, { profissionalId, requestId, valorReais, referenciaId }) {
   const resp = await fetch(`${env.SUPABASE_URL}/rest/v1/solicitacoes_moedas`, {
     method: 'POST',
     headers: {
@@ -51,7 +75,8 @@ async function criarSolicitacao(env, { profissionalId, quantidade, valorReais, r
     },
     body: JSON.stringify({
       profissional_id: profissionalId,
-      quantidade,
+      request_id: requestId,
+      quantidade: 0,
       valor_reais: valorReais,
       status: 'pendente',
       referencia_id: referenciaId,
@@ -120,27 +145,35 @@ async function handleCriarCheckout({ request, env }) {
     return jsonResponse(400, { erro: 'JSON inválido' });
   }
 
-  const pacote = PACOTES[body.pacoteId];
-  if (!pacote) {
-    return jsonResponse(400, { erro: 'Pacote inválido' });
+  const requestId = body.requestId;
+  if (!requestId) {
+    return jsonResponse(400, { erro: 'Pedido inválido' });
   }
 
   const perfil = await buscarPerfil(env, usuario.id);
   if (!perfil || perfil.role !== 'profissional') {
-    return jsonResponse(403, { erro: 'Apenas profissionais podem comprar moedas' });
+    return jsonResponse(403, { erro: 'Apenas profissionais podem liberar contatos' });
   }
 
-  // Usamos um UUID como order_nsu: é o identificador que a InfinitePay nos
-  // devolve de volta no webhook e no payment_check, e é o mesmo valor que
-  // gravamos em referencia_id pra depois casar com a solicitação certa.
+  const pedido = await buscarPedido(env, requestId);
+  if (!pedido) {
+    return jsonResponse(404, { erro: 'Pedido não encontrado' });
+  }
+
+  // Se já pagou por esse contato antes, não cobra de novo — só avisa o front
+  // pra ele revelar o contato direto (painel.html já trata jaLiberado).
+  if (await jaLiberado(env, usuario.id, requestId)) {
+    return jsonResponse(200, { jaLiberado: true });
+  }
+
   const referenciaId = crypto.randomUUID();
 
   let solicitacao;
   try {
     solicitacao = await criarSolicitacao(env, {
       profissionalId: usuario.id,
-      quantidade: pacote.quantidade,
-      valorReais: pacote.valorReais,
+      requestId,
+      valorReais: VALOR_LIBERACAO_REAIS,
       referenciaId,
     });
   } catch (e) {
@@ -148,7 +181,7 @@ async function handleCriarCheckout({ request, env }) {
     return jsonResponse(500, { erro: 'Não foi possível registrar a solicitação' });
   }
 
-  const valorCentavos = Math.round(pacote.valorReais * 100);
+  const valorCentavos = Math.round(VALOR_LIBERACAO_REAIS * 100);
 
   const checkoutPayload = {
     handle: env.INFINITEPAY_HANDLE.trim().replace(/^\$/, ''),
@@ -157,10 +190,10 @@ async function handleCriarCheckout({ request, env }) {
       {
         quantity: 1,
         price: valorCentavos,
-        description: `${pacote.quantidade} moedas RicServ`,
+        description: 'Liberação de contato — RicServ',
       },
     ],
-    redirect_url: `${env.SITE_URL}/comprar-moedas.html?checkout=retorno`,
+    redirect_url: `${env.SITE_URL}/painel.html?checkout=retorno&request_id=${requestId}`,
     webhook_url: `${env.SITE_URL}/api/webhook-infinitepay`,
     customer: {
       name: perfil.nome_completo || perfil.nome || undefined,
