@@ -4,11 +4,11 @@
 //
 // A InfinitePay não documenta uma assinatura de segurança pro webhook, então
 // NUNCA confiamos apenas no corpo que chegou aqui: confirmamos o pagamento
-// direto na API deles (POST /payment_check) antes de creditar qualquer
-// moeda. Também confere se o valor pago bate com o valor esperado.
+// direto na API deles (POST /payment_check) antes de liberar qualquer
+// contato. Também confere se o valor pago bate com o valor esperado.
 //
 // Idempotente: se a InfinitePay reenviar a mesma notificação, a solicitação
-// já vai estar 'pago' e nada é creditado de novo.
+// já vai estar 'pago' e nada é liberado de novo.
 
 function jsonResponse(status, body) {
   return new Response(JSON.stringify(body), {
@@ -43,19 +43,22 @@ async function marcarComoPago(env, id) {
   });
 }
 
-async function creditarMoedas(env, profissionalId, quantidade) {
-  const resp = await fetch(`${env.SUPABASE_URL}/rest/v1/rpc/credit_moedas`, {
+async function liberarContato(env, profissionalId, requestId) {
+  // upsert evita erro se, por alguma corrida, já existir o registro
+  // (ex: dois webhooks reenviados quase juntos).
+  const resp = await fetch(`${env.SUPABASE_URL}/rest/v1/contatos_liberados`, {
     method: 'POST',
     headers: {
       apikey: env.SUPABASE_SERVICE_ROLE_KEY,
       Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
       'Content-Type': 'application/json',
+      Prefer: 'resolution=merge-duplicates',
     },
-    body: JSON.stringify({ p_profissional_id: profissionalId, p_quantidade: quantidade }),
+    body: JSON.stringify({ profissional_id: profissionalId, request_id: requestId }),
   });
   if (!resp.ok) {
     const erro = await resp.text();
-    throw new Error(`Falha ao creditar moedas: ${erro}`);
+    throw new Error(`Falha ao liberar contato: ${erro}`);
   }
 }
 
@@ -88,6 +91,11 @@ export async function onRequestPost({ request, env }) {
 
   if (solicitacao.status === 'pago') {
     return new Response('OK - ja processado', { status: 200 });
+  }
+
+  if (!solicitacao.request_id) {
+    console.error('Solicitacao sem request_id — não é possível liberar contato', solicitacao.id);
+    return new Response('OK - solicitacao sem pedido vinculado', { status: 200 });
   }
 
   // Camada de segurança: nunca confiar só no corpo do webhook. Confirma
@@ -123,7 +131,7 @@ export async function onRequestPost({ request, env }) {
   const valorPagoCentavos = confirmacao.paid_amount ?? confirmacao.amount;
   if (typeof valorPagoCentavos !== 'number' || valorPagoCentavos < valorEsperadoCentavos) {
     console.error(
-      'Valor pago menor que o esperado — não creditando',
+      'Valor pago menor que o esperado — não liberando contato',
       orderNsu,
       'esperado:', valorEsperadoCentavos,
       'pago:', valorPagoCentavos
@@ -132,11 +140,11 @@ export async function onRequestPost({ request, env }) {
   }
 
   try {
-    await creditarMoedas(env, solicitacao.profissional_id, solicitacao.quantidade);
+    await liberarContato(env, solicitacao.profissional_id, solicitacao.request_id);
     await marcarComoPago(env, solicitacao.id);
   } catch (e) {
-    console.error('Erro ao creditar moedas', e);
-    return new Response('Falha ao creditar moedas', { status: 500 });
+    console.error('Erro ao liberar contato', e);
+    return new Response('Falha ao liberar contato', { status: 500 });
   }
 
   return new Response('OK', { status: 200 });
