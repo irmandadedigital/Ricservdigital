@@ -49,6 +49,9 @@
     <p style="text-align:center; font-size:14px; color:var(--muted); margin-top:18px;">
       Ainda não tem conta? <a href="/cadastro.html" style="color:var(--primary); font-weight:600;">Cadastre-se</a>
     </p>
+
+    <!-- DIAGNÓSTICO TEMPORÁRIO: remover depois de achar o problema -->
+    <div id="debugBox" style="margin-top:20px; padding:12px; background:#f4f4f5; border:1px dashed #999; border-radius:8px; font-size:12px; color:#333; word-break:break-all; white-space:pre-wrap;"></div>
   </section>
 
   <footer>
@@ -63,6 +66,18 @@
     document.getElementById('msgBox').innerHTML = `<div class="msg ${tipo}">${texto}</div>`;
   }
 
+  function mostraDebug(info) {
+    document.getElementById('debugBox').textContent = 'DEBUG (temporário): ' + info;
+  }
+
+  // Mostra logo de cara se o sb (cliente Supabase) carregou e com qual URL,
+  // pra já descartar problema de config.js / chave errada.
+  try {
+    mostraDebug('config.js carregado. URL Supabase em uso: ' + (sb?.supabaseUrl || 'não encontrada (sb.supabaseUrl indisponível)'));
+  } catch (e) {
+    mostraDebug('ERRO ao carregar config.js ou cliente sb: ' + e.message);
+  }
+
   document.getElementById('formLogin').addEventListener('submit', async (e) => {
     e.preventDefault();
     const btn = document.getElementById('btnEntrar');
@@ -72,16 +87,26 @@
     const email = document.getElementById('email').value.trim();
     const senha = document.getElementById('senha').value;
 
-    const { error } = await sb.auth.signInWithPassword({ email, password: senha });
+    try {
+      const { data, error } = await sb.auth.signInWithPassword({ email, password: senha });
 
-    if (error) {
-      mostraMsg(traduzErroLogin(error.message), 'error');
+      if (error) {
+        mostraMsg(traduzErroLogin(error.message), 'error');
+        mostraDebug('status: ' + (error.status || '?') + ' | name: ' + (error.name || '?') + ' | message: ' + error.message);
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+        return;
+      }
+
+      mostraDebug('Login OK, sessão criada. Redirecionando...');
+      window.location.href = '/painel.html';
+    } catch (e) {
+      // Captura erros que nem chegam a virar "error" do Supabase: rede, CORS, etc.
+      mostraMsg('Não foi possível entrar agora. Tente novamente em instantes.', 'error');
+      mostraDebug('EXCEÇÃO (provável rede/CORS/config): ' + e.message);
       btn.disabled = false;
       btn.textContent = 'Entrar';
-      return;
     }
-
-    window.location.href = '/painel.html';
   });
 
   function traduzErroLogin(msg) {
