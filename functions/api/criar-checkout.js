@@ -178,7 +178,10 @@ async function handleCriarCheckout({ request, env }) {
     });
   } catch (e) {
     console.error('Erro ao criar solicitacao', e);
-    return jsonResponse(500, { erro: 'Não foi possível registrar a solicitação' });
+    return jsonResponse(500, {
+      erro: 'Não foi possível registrar a solicitação',
+      detalhes: e && e.message ? e.message : String(e), // TEMPORÁRIO: remover depois de achar a causa
+    });
   }
 
   const valorCentavos = Math.round(VALOR_LIBERACAO_REAIS * 100);
