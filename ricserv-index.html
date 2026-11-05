@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RicServ – Serviços de engajamento</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600&display=swap">
+<style>
+:root{--bg:#f3f5fb;--fg:#0b1030;--mut:#5b6384;--card:#fff;--line:#dfe3f2;--acc:#ff2d55;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#050826;--fg:#eef1ff;--mut:#9aa3d6;--card:#0c1240;--line:#1c2670}}
+:root[data-theme="dark"]{--bg:#050826;--fg:#eef1ff;--mut:#9aa3d6;--card:#0c1240;--line:#1c2670}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 Inter,system-ui,sans-serif}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:10px 16px;flex-wrap:wrap}
+.logo{font:26px Anton,Impact,sans-serif;letter-spacing:.5px}.logo b{color:var(--acc)}
+nav{display:flex;gap:14px;margin-left:auto;font-size:14px;align-items:center;flex-wrap:wrap}
+nav a{color:var(--mut);text-decoration:none}
+.btn{border:0;border-radius:10px;padding:9px 16px;font:600 14px Inter,sans-serif;cursor:pointer;background:var(--acc);color:#fff}
+.btn.o{background:none;border:1px solid var(--line);color:var(--fg)}
+.hero{padding:34px 16px 10px;max-width:1100px;margin:auto}
+.hero h1{font:clamp(34px,7vw,64px)/1.02 Anton,Impact,sans-serif;margin:0 0 10px}
+.hero p{color:var(--mut);max-width:560px;margin:0}
+.bar{max-width:1100px;margin:18px auto 0;padding:0 16px;display:flex;gap:8px;flex-wrap:wrap}
+.bar input{flex:1 1 220px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit}
+.tabs{max-width:1100px;margin:10px auto 0;padding:0 16px;display:flex;gap:6px;overflow-x:auto}
+.tabs button{white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:20px;padding:6px 14px;cursor:pointer;font:600 13px Inter,sans-serif}
+.tabs button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.grid{max-width:1100px;margin:18px auto;padding:0 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.bn{position:relative;border-radius:18px;padding:14px;color:#fff;background:radial-gradient(circle at 85% 8%,#1b4fe0 0,#0a1a6e 38%,#040a30 100%);border:2px solid var(--g1);box-shadow:0 0 22px -4px var(--g1);overflow:hidden;font-family:Anton,Impact,sans-serif;display:flex;flex-direction:column;gap:10px}
+.bn:after{content:"";position:absolute;right:-60px;bottom:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,#3bd0ff55,transparent 65%)}
+.top{display:flex;align-items:center;gap:12px}
+.ico{flex:none;width:68px;height:68px;border-radius:18px;display:grid;place-items:center;font-size:36px;background:linear-gradient(135deg,var(--gr));box-shadow:0 4px 14px #0008}
+.tt{font-size:30px;line-height:1;text-shadow:0 3px 0 #000a}
+.tt span{display:block;font-size:25px;color:#ffe21a}
+.ch{display:grid;grid-template-columns:1fr 1fr;gap:7px;z-index:1}
+.c{display:flex;align-items:center;gap:7px;border:2px solid var(--k);border-radius:12px;padding:6px 8px;background:#02061acc;font-size:15px;line-height:1.1;min-height:46px;box-shadow:0 0 10px -3px var(--k)}
+.c i{font-style:normal;font-size:20px}
+.price{z-index:1;display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.pr{background:linear-gradient(100deg,#d3101b,#ff2a2a);padding:2px 18px 2px 12px;border-radius:4px 22px 4px 22px;font-size:46px;line-height:1.1;color:#ffe21a;text-shadow:0 3px 0 #0007}
+.pr small{font-size:20px;color:#fff;margin-right:3px}
+.unit{font:600 12px Inter,sans-serif;color:#c9d3ff;text-align:right}
+.buy{margin:-4px 0 0;z-index:1;border:0;border-radius:12px;padding:11px;font:18px Anton,Impact,sans-serif;letter-spacing:.5px;background:#ffe21a;color:#0b1030;cursor:pointer}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--fg);width:min(420px,92vw);padding:20px}
+dialog::backdrop{background:#000a}
+dialog label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+dialog input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit}
+.tot{font:30px Anton,Impact,sans-serif;margin:14px 0 4px}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:24px 16px 40px}
+.empty{grid-column:1/-1;text-align:center;color:var(--mut);padding:40px 0}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #3bd0ff;outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+<div class="logo">Ric<b>Serv</b></div>
+<nav><a href="#servicos">Serviços</a><a class="btn" href="https://wa.me/5511937413799" style="text-decoration:none;color:#fff">Falar no WhatsApp</a></nav>
+</header>
+<section class="hero">
+<h1>Escolha o serviço.<br>Veja o preço na hora.</h1>
+<p>Cada pacote mostra o que está incluso: origem, reposição, velocidade, limite e tempo de início. Preços por 1.000 unidades.</p>
+</section>
+<div class="bar"><input id="q" type="search" placeholder="Buscar serviço, ex.: seguidores, curtidas, live" aria-label="Buscar serviço"></div>
+<div class="tabs" id="tabs" role="tablist"></div>
+<main class="grid" id="servicos"></main>
+<dialog id="dlg">
+<h3 id="dt" style="margin:0;font:24px Anton,Impact,sans-serif"></h3>
+<label for="lk">Link do perfil ou da publicação</label><input id="lk" placeholder="https://">
+<label for="qt">Quantidade</label><input id="qt" type="number" value="1000" step="10">
+<div class="tot" id="tot"></div>
+<div style="font-size:12px;color:var(--mut)" id="rg"></div>
+<div style="display:flex;gap:8px;margin-top:14px"><button class="btn" id="go" style="flex:1">Fazer pedido</button><button class="btn o" id="cl">Fechar</button></div>
+<p id="ok" style="color:#17a34a;font-size:13px;margin:10px 0 0"></p>
+</dialog>
+<footer>© 2026 RicServ · <a href="privacidade.html" style="color:inherit">Política de Privacidade</a> · Suporte pelo WhatsApp</footer>
+<script>
+const P={ig:["Instagram","📸","#f9ce34,#ee2a7b,#6228d7","#ee2a7b"],tt:["TikTok","🎵","#25f4ee,#fe2c55","#25f4ee"],yt:["YouTube","▶️","#ff0000,#ff6a00","#ff2a2a"],kw:["Kwai","🎬","#ff7a00,#ffb300","#ff8a00"],fb:["Facebook","👍","#1877f2,#00c6ff","#2d8cff"],tg:["Telegram","✈️","#2aabee,#229ed9","#2aabee"],wa:["WhatsApp","💬","#25d366,#128c7e","#25d366"],tw:["Twitch","🎮","#9146ff,#6a1bff","#a970ff"],ki:["Kick","🟢","#53fc18,#0b8f2b","#53fc18"],sp:["Spotify","🎧","#1db954,#0a7a35","#1ed760"],x:["X","✖️","#888,#ddd","#cfd4ff"],sh:["Shopee","🛍️","#ee4d2d,#ff9a3c","#ff6a3c"]};
+// plataforma, produto, origem, qualidade, reposição, velocidade, máximo, início, preço por 1.000
+const D=[
+["ig","Seguidores","Mundiais","Contas Antigas","Sem Reposição","20-30K/dia","1M","5-30 min",10.26],
+["ig","Seguidores","Brasileiros","Alta Qualidade","Reposição 30 dias","3-5K/dia","100K","0-30 min",45.47],
+["ig","Curtidas","Mundiais","Perfis com Foto","Reposição 365 dias","500K/dia","1M","0-10 min",0.54],
+["ig","Visualizações","Reels e Vídeos","Sem Quedas","Sem Reposição","300-500K/dia","200M","0-15 min",0.01],
+["ig","Comentários","Brasileiros","Personalizados","Sem Reposição","50K/dia","300","0-1 h",110.5],
+["tt","Seguidores","Brasileiros","100% BR","Reposição 30 dias","5K/dia","10K","0-5 min",27.41],
+["tt","Curtidas","Brasileiras","Alta Qualidade","Sem Reposição","200-300/dia","10M","0-60 min",8.36],
+["tt","Visualizações","Mundiais","Cancelamento Ativo","Garantia 30 dias","100M/dia","2B","Imediato",0.32],
+["yt","Visualizações","Mundiais","Anúncios Nativos","Vitalício","18 h/pedido","1B","Rápido",3.37],
+["yt","Inscritos","Premium","Contas Reais","Reposição 30 dias","100/dia","10K","Gradual",116.1],
+["yt","Live (15 min)","Espectadores","Concorrentes","Duração 15 min","Instantâneo","1M","Imediato",3.27],
+["kw","Seguidores","Brasileiros","Premium","Reposição 30 dias","50-100K/dia","1M","0-30 min",5.52],
+["fb","Seguidores","Página e Perfil","Baixa Perda","Garantia 30 dias","50K/dia","5M","Imediato",3.45],
+["tg","Membros","Canal ou Grupo","Sem Quedas","Reposição 30 dias","9 min/pedido","5K","0-6 h",2.66],
+["wa","Membros","Canal","Alta Qualidade","Sem Reposição","20K/dia","20K","0-10 min",1.39],
+["tw","Seguidores","Mundiais","Estável","Reposição 30 dias","Rápido","5K","0-30 min",1.22],
+["ki","Seguidores","Mundiais","Alta Qualidade","Reposição 60 dias","10K/dia","100K","Imediato",3.47],
+["sp","Plays","Mundiais","Premium","Garantia vitalícia","3,5K/dia","10M","Imediato",3.37],
+["x","Visualizações","Vídeos","Envio Rápido","Sem Reposição","50-100K/hora","100M","1 min",0.02],
+["sh","Live (30 min)","Espectadores","Sem Quedas","Duração 30 min","Instantâneo","100K","0-5 min",20.13]
+];
+const K=["#27c7ff","#ffc21a","#ff3b6b","#ff5a3c","#3dff6e","#c44bff"];
+const MULT=1.5; // multiplicador de preço: altere aqui (2 = dobro do valor base)
+const WA="5511937413799"; // seu WhatsApp com DDI+DDD, ex.: "5511999999999"
+D.forEach(d=>d[8]=Math.round(d[8]*MULT*100)/100);
+const brl=n=>n.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+function card(d,i){
+ const p=P[d[0]],no=d[4].startsWith("Sem");
+ const ch=[["🌍",d[2]],["🛡️",d[3]],[no?"🚫":"♻️",d[4]],["🚀",d[5]],["👑","Máx: "+d[6]],["⏱️","Início: "+d[7]]];
+ return `<article class="bn" style="--g1:${p[3]};--gr:${p[2]}"><div class="top"><div class="ico">${p[1]}</div><div class="tt">${p[0]}<span>${d[1]}</span></div></div>
+ <div class="ch">${ch.map((c,j)=>`<div class="c" style="--k:${K[j]}"><i>${c[0]}</i>${c[1]}</div>`).join("")}</div>
+ <div class="price"><div class="pr"><small>R$</small>${brl(d[8])}</div><div class="unit">por 1.000<br>unidades</div></div>
+ <button class="buy" data-i="${i}">COMPRAR AGORA</button></article>`;
+}
+let f="all";
+function render(){
+ const q=document.getElementById("q").value.toLowerCase();
+ const l=D.map((d,i)=>[d,i]).filter(([d])=>(f=="all"||d[0]==f)&&(P[d[0]][0]+" "+d.join(" ")).toLowerCase().includes(q));
+ document.getElementById("servicos").innerHTML=l.length?l.map(([d,i])=>card(d,i)).join(""):'<div class="empty">Nenhum serviço encontrado. Tente outro termo.</div>';
+}
+const tabs=document.getElementById("tabs");
+tabs.innerHTML='<button class="on" data-f="all">Todos</button>'+[...new Set(D.map(d=>d[0]))].map(k=>`<button data-f="${k}">${P[k][0]}</button>`).join("");
+tabs.onclick=e=>{const b=e.target.closest("button");if(!b)return;f=b.dataset.f;[...tabs.children].forEach(x=>x.classList.toggle("on",x==b));render()};
+document.getElementById("q").oninput=render;
+const dlg=document.getElementById("dlg"),qt=document.getElementById("qt");let cur=null;
+function tot(){document.getElementById("tot").textContent="Total: R$ "+brl(cur[8]*(+qt.value||0)/1000)}
+document.getElementById("servicos").onclick=e=>{const b=e.target.closest(".buy");if(!b)return;cur=D[b.dataset.i];
+ document.getElementById("dt").textContent=P[cur[0]][0]+" · "+cur[1];
+ document.getElementById("rg").textContent=cur[4]+" · "+cur[5]+" · mínimo 10, máximo "+cur[6];
+ document.getElementById("ok").textContent="";tot();dlg.showModal()};
+qt.oninput=tot;
+document.getElementById("cl").onclick=()=>dlg.close();
+document.getElementById("go").onclick=()=>{const m=`Olá! Quero ${P[cur[0]][0]} ${cur[1]} (${cur[2]}), qtd ${qt.value}, link: ${document.getElementById("lk").value}. Total R$ ${brl(cur[8]*(+qt.value||0)/1000)}`;
+ if(WA){location.href="https://wa.me/"+WA+"?text="+encodeURIComponent(m)}else{document.getElementById("ok").textContent="Defina o número em WA no código para receber pedidos."}};
+render();
+</script>
+</body>
+</html>
