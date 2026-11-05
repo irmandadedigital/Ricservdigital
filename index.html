@@ -150,7 +150,7 @@ D.forEach(d=>d[8]=Math.max(MIN,Math.round(d[8]*MULT*100)/100));
 const brl=n=>n.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
 function card(d,i){
  const p=P[d[0]],no=d[3].startsWith("Sem");
- const ch=[["🛡️",d[2]],[no?"🚫":d[3].startsWith("Dur")?"⏳":"♻️",d[3]],["🚀",d[4]],["📦",d[5]&&"Mín: "+d[5]],["👑",d[6]&&"Máx: "+d[6]],["⏱️",d[7]&&"Início: "+d[7]]].filter(c=>c[1]);
+ const ch=[["🛡️",d[2]],[no?"🚫":d[3].startsWith("Dur")?"⏳":"♻️",d[3]],["🚀",d[4]],["📦","Mín: "+minQ(d)],["👑",d[6]&&"Máx: "+d[6]],["⏱️",d[7]&&"Início: "+d[7]]].filter(c=>c[1]);
  return `<article class="bn" style="--g1:${p[3]};--gr:${p[2]}"><div class="top"><div class="ico">${p[1]}</div><div class="tt">${p[0]}<span>${d[1]}</span></div></div>
  <div class="ch">${ch.map((c,j)=>`<div class="c" style="--k:${K[j%6]}"><i>${c[0]}</i>${c[1]}</div>`).join("")}</div>
  <div class="price"><div class="pr"><small>R$</small>${brl(d[8])}</div><div class="unit">por 1.000<br>unidades</div></div>
@@ -177,14 +177,14 @@ ui();
 const dlg=document.getElementById("dlg"),qt=document.getElementById("qt");let cur=null;
 const num=v=>{const m=/^(\d+(?:[.,]\d+)?)([KMB]?)/i.exec(v||"");return m?parseFloat(m[1].replace(",","."))*({K:1e3,M:1e6,B:1e9}[m[2].toUpperCase()]||1):0};
 let mq=1;
-function minQ(){ // menor quantidade (1, 2, 5, 10, 20, 50...) que chega a R$ 1,00, respeitando o mínimo do serviço
- const need=Math.ceil(1000/cur[8]);
- for(let q=1;;q*=10)for(const k of [1,2,5])if(q*k>=need)return Math.max(q*k,num(cur[5])||1);
+function minQ(d){ // menor quantidade (1, 2, 5, 10, 20, 50...) que chega a R$ 1,00, respeitando o mínimo do serviço
+ const need=Math.ceil(1000/d[8]);
+ for(let q=1;;q*=10)for(const k of [1,2,5])if(q*k>=need)return Math.max(q*k,num(d[5])||1);
 }
 function tot(){const q=+qt.value||0;document.getElementById("tot").textContent="Total: R$ "+brl(Math.max(1,cur[8]*q/1000))}
 function fix(){if((+qt.value||0)<mq)qt.value=mq;tot()}
 document.getElementById("servicos").onclick=e=>{const b=e.target.closest(".buy");if(!b)return;cur=D[b.dataset.i];
- mq=minQ();qt.min=mq;qt.value=Math.max(mq,Math.min(1000,num(cur[6])||1000));
+ mq=minQ(cur);qt.min=mq;qt.value=Math.max(mq,Math.min(1000,num(cur[6])||1000));
  document.getElementById("dt").textContent=P[cur[0]][0]+" · "+cur[1];
  document.getElementById("rg").textContent=[cur[3],cur[4],"mínimo "+mq,cur[6]&&"máximo "+cur[6]].filter(x=>x).join(" · ");
  document.getElementById("ok").textContent="";tot();dlg.showModal()};
