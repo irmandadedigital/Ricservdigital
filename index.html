@@ -26,6 +26,7 @@ nav a{color:var(--mut);text-decoration:none}
 .tabs{max-width:1100px;margin:10px auto 0;padding:0 16px;display:flex;gap:6px;overflow-x:auto}
 .tabs button{white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:20px;padding:6px 14px;cursor:pointer;font:600 13px Inter,sans-serif}
 .tabs button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+#servicos{scroll-margin-top:90px}
 .grid{max-width:1100px;margin:18px auto;padding:0 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
 .bn{position:relative;border-radius:18px;padding:14px;color:#fff;background:radial-gradient(circle at 85% 8%,#1b4fe0 0,#0a1a6e 38%,#040a30 100%);border:2px solid var(--g1);box-shadow:0 0 22px -4px var(--g1);overflow:hidden;font-family:Anton,Impact,sans-serif;display:flex;flex-direction:column;gap:10px}
 .bn:after{content:"";position:absolute;right:-60px;bottom:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,#3bd0ff55,transparent 65%)}
@@ -60,7 +61,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #3bd0
 <h1>Escolha o serviço.<br>Veja o preço na hora.</h1>
 <p>Cada pacote mostra o que está incluso: origem, reposição, velocidade, limite e tempo de início. Preços por 1.000 unidades.</p>
 </section>
-<div class="bar"><input id="q" type="search" placeholder="Buscar serviço, ex.: seguidores, curtidas, live" aria-label="Buscar serviço"></div>
+<div class="bar"><input id="q" type="search" enterkeyhint="search" autocomplete="off" placeholder="Buscar serviço, ex.: seguidores, curtidas, live" aria-label="Buscar serviço"></div>
 <div class="tabs" id="cats" role="tablist"></div>
 <div class="tabs" id="tabs"></div>
 <main class="grid" id="servicos"></main>
@@ -167,21 +168,31 @@ function ui(){
  const ps=[...new Set(D.filter(d=>cat(d)==ct&&(sc||d[8]>=FEAT)).map(d=>d[0]))];
  tabs.innerHTML=`<button class="${f=="all"?"on":""}" data-f="all">Todas</button>`+ps.map(k=>`<button class="${f==k?"on":""}" data-f="${k}">${P[k][0]}</button>`).join("");
 }
+const nz=t=>t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
 function render(){
- const q=document.getElementById("q").value.toLowerCase();
- const l=D.map((d,i)=>[d,i]).filter(([d])=>(q||cat(d)==ct)&&(q||f=="all"||d[0]==f)&&(P[d[0]][0]+" "+d.join(" ")).toLowerCase().includes(q));
- const hi=l.filter(([d])=>d[8]>=FEAT),lo=l.filter(([d])=>d[8]<FEAT);
- let h=hi.map(([d,i])=>card(d,i)).join("");
- if(lo.length){
-  const show=sc||q;
-  h+=`<div class="empty" style="grid-column:1/-1"><button class="btn o" id="baratos">${show&&!q?"Ocultar":"Ver"} serviços econômicos (${lo.length})</button><div style="font-size:13px;margin-top:6px">Pedido mínimo de R$ 5,00 nesses serviços</div></div>`;
-  if(show)h+=lo.map(([d,i])=>card(d,i)).join("");
+ const q=document.getElementById("q").value.trim(),T=nz(q).split(/\s+/).filter(Boolean);
+ cats.style.display=tabs.style.display=T.length?"none":"";
+ const hay=d=>nz(P[d[0]][0]+" "+d.slice(1,8).join(" ")+" "+cat(d));
+ const l=D.map((d,i)=>[d,i]).filter(([d])=>T.length?T.every(t=>hay(d).includes(t)):cat(d)==ct&&(f=="all"||d[0]==f));
+ let h="";
+ if(T.length){
+  h=`<div class="empty" style="grid-column:1/-1;padding:0;text-align:left">${l.length} resultado${l.length==1?"":"s"} para “${q.replace(/[<>&]/g,"")}” · <button class="btn o" id="limpar" style="padding:4px 12px">Limpar busca</button></div>`+l.map(([d,i])=>card(d,i)).join("");
+  if(!l.length)h=h.replace(/<\/div>$/,'</div><div class="empty" style="grid-column:1/-1">Nenhum serviço encontrado. Tente outro termo, como seguidores, curtidas ou o nome da rede.</div>');
+ }else{
+  const hi=l.filter(([d])=>d[8]>=FEAT),lo=l.filter(([d])=>d[8]<FEAT);
+  h=hi.map(([d,i])=>card(d,i)).join("");
+  if(lo.length){
+   h+=`<div class="empty" style="grid-column:1/-1"><button class="btn o" id="baratos">${sc?"Ocultar":"Ver"} serviços econômicos (${lo.length})</button><div style="font-size:13px;margin-top:6px">Pedido mínimo de R$ 5,00 nesses serviços</div></div>`;
+   if(sc)h+=lo.map(([d,i])=>card(d,i)).join("");
+  }
  }
- document.getElementById("servicos").innerHTML=h||'<div class="empty">Nenhum serviço encontrado. Tente outro termo.</div>';
+ document.getElementById("servicos").innerHTML=h||'<div class="empty">Nenhum serviço encontrado.</div>';
 }
 cats.onclick=e=>{const b=e.target.closest("button");if(!b)return;ct=b.dataset.c;f="all";sc=false;ui();render()};
 tabs.onclick=e=>{const b=e.target.closest("button");if(!b)return;f=b.dataset.f;ui();render()};
-document.getElementById("q").oninput=render;
+const qi=document.getElementById("q");
+qi.oninput=qi.onsearch=qi.onkeyup=render;
+qi.onkeydown=e=>{if(e.key=="Enter"){e.preventDefault();qi.blur();document.getElementById("servicos").scrollIntoView({behavior:"smooth"})}};
 ui();
 const dlg=document.getElementById("dlg"),qt=document.getElementById("qt");let cur=null;
 const num=v=>{const m=/^(\d+(?:[.,]\d+)?)([KMB]?)/i.exec(v||"");return m?parseFloat(m[1].replace(",","."))*({K:1e3,M:1e6,B:1e9}[m[2].toUpperCase()]||1):0};
@@ -192,7 +203,7 @@ function minQ(d){ // menor quantidade (1, 2, 5, 10, 20, 50...) que chega ao pedi
 }
 function tot(){const q=+qt.value||0;document.getElementById("tot").textContent="Total: R$ "+brl(Math.max(tg(cur),cur[8]*q/1000))}
 function fix(){if((+qt.value||0)<mq)qt.value=mq;tot()}
-document.getElementById("servicos").onclick=e=>{if(e.target.id=="baratos"){sc=!sc;ui();render();return}const b=e.target.closest(".buy");if(!b)return;cur=D[b.dataset.i];
+document.getElementById("servicos").onclick=e=>{if(e.target.id=="limpar"){qi.value="";render();return}if(e.target.id=="baratos"){sc=!sc;ui();render();return}const b=e.target.closest(".buy");if(!b)return;cur=D[b.dataset.i];
  mq=minQ(cur);qt.min=mq;qt.value=Math.max(mq,Math.min(1000,num(cur[6])||1000));
  document.getElementById("dt").textContent=P[cur[0]][0]+" · "+cur[1];
  document.getElementById("rg").textContent=[cur[3],cur[4],"mínimo "+mq,cur[6]&&"máximo "+cur[6],cur[8]<FEAT&&"pedido mínimo R$ 5,00"].filter(x=>x).join(" · ");
