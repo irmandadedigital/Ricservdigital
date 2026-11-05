@@ -186,7 +186,7 @@ function fix(){if((+qt.value||0)<mq)qt.value=mq;tot()}
 document.getElementById("servicos").onclick=e=>{const b=e.target.closest(".buy");if(!b)return;cur=D[b.dataset.i];
  mq=minQ();qt.min=mq;qt.value=Math.max(mq,Math.min(1000,num(cur[6])||1000));
  document.getElementById("dt").textContent=P[cur[0]][0]+" · "+cur[1];
- document.getElementById("rg").textContent=[cur[3],cur[4],"mínimo "+mq.toLocaleString("pt-BR")+" (R$ 1,00)",cur[6]&&"máximo "+cur[6]].filter(x=>x).join(" · ");
+ document.getElementById("rg").textContent=[cur[3],cur[4],"mínimo "+mq,cur[6]&&"máximo "+cur[6]].filter(x=>x).join(" · ");
  document.getElementById("ok").textContent="";tot();dlg.showModal()};
 qt.oninput=tot;qt.onchange=fix;
 document.getElementById("cl").onclick=()=>dlg.close();
