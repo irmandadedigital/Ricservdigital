@@ -175,14 +175,22 @@ tabs.onclick=e=>{const b=e.target.closest("button");if(!b)return;f=b.dataset.f;u
 document.getElementById("q").oninput=render;
 ui();
 const dlg=document.getElementById("dlg"),qt=document.getElementById("qt");let cur=null;
-function tot(){document.getElementById("tot").textContent="Total: R$ "+brl(cur[8]*(+qt.value||0)/1000)}
+const num=v=>{const m=/^(\d+(?:[.,]\d+)?)([KMB]?)/i.exec(v||"");return m?parseFloat(m[1].replace(",","."))*({K:1e3,M:1e6,B:1e9}[m[2].toUpperCase()]||1):0};
+let mq=1;
+function minQ(){ // menor quantidade (1, 2, 5, 10, 20, 50...) que chega a R$ 1,00, respeitando o mínimo do serviço
+ const need=Math.ceil(1000/cur[8]);
+ for(let q=1;;q*=10)for(const k of [1,2,5])if(q*k>=need)return Math.max(q*k,num(cur[5])||1);
+}
+function tot(){const q=+qt.value||0;document.getElementById("tot").textContent="Total: R$ "+brl(Math.max(1,cur[8]*q/1000))}
+function fix(){if((+qt.value||0)<mq)qt.value=mq;tot()}
 document.getElementById("servicos").onclick=e=>{const b=e.target.closest(".buy");if(!b)return;cur=D[b.dataset.i];
+ mq=minQ();qt.min=mq;qt.value=Math.max(mq,Math.min(1000,num(cur[6])||1000));
  document.getElementById("dt").textContent=P[cur[0]][0]+" · "+cur[1];
- document.getElementById("rg").textContent=[cur[3],cur[4],"mínimo "+cur[5],"máximo "+cur[6]].filter(x=>x).join(" · ");
+ document.getElementById("rg").textContent=[cur[3],cur[4],"mínimo "+mq.toLocaleString("pt-BR")+" (R$ 1,00)",cur[6]&&"máximo "+cur[6]].filter(x=>x).join(" · ");
  document.getElementById("ok").textContent="";tot();dlg.showModal()};
-qt.oninput=tot;
+qt.oninput=tot;qt.onchange=fix;
 document.getElementById("cl").onclick=()=>dlg.close();
-document.getElementById("go").onclick=()=>{const m=`Olá! Quero ${P[cur[0]][0]} ${cur[1]} (${cur[2]}), qtd ${qt.value}, link: ${document.getElementById("lk").value}. Total R$ ${brl(cur[8]*(+qt.value||0)/1000)}`;
+document.getElementById("go").onclick=()=>{fix();const m=`Olá! Quero ${P[cur[0]][0]} ${cur[1]} (${cur[2]}), qtd ${qt.value}, link: ${document.getElementById("lk").value}. Total R$ ${brl(cur[8]*(+qt.value||0)/1000)}`;
  if(WA){location.href="https://wa.me/"+WA+"?text="+encodeURIComponent(m)}else{document.getElementById("ok").textContent="Defina o número em WA no código para receber pedidos."}};
 render();
 </script>
