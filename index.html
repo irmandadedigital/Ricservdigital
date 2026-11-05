@@ -156,37 +156,46 @@ function card(d,i){
  <div class="price"><div class="pr"><small>R$</small>${brl(d[8])}</div><div class="unit">por 1.000<br>unidades</div></div>
  <button class="buy" data-i="${i}">COMPRAR AGORA</button></article>`;
 }
-let f="all",ct="Seguidores";
+let f="all",ct="Seguidores",sc=false;
+const FEAT=5; // serviços acima de R$ 5 por mil ficam em destaque; abaixo disso o pedido mínimo é R$ 5,00
+const tg=d=>d[8]<FEAT?5:1;
 const CT=["Seguidores","Curtidas","Visualizações","Comentários","Outros"];
 const cat=d=>/seguidor|membro|inscrito/i.test(d[1])?CT[0]:/curtida|reaç/i.test(d[1])?CT[1]:/coment/i.test(d[1])?CT[3]:/visualiza|live|plays|espectad/i.test(d[1])?CT[2]:CT[4];
 const cats=document.getElementById("cats"),tabs=document.getElementById("tabs");
 function ui(){
  cats.innerHTML=CT.map(c=>`<button class="${c==ct?"on":""}" data-c="${c}">${c}</button>`).join("");
- const ps=[...new Set(D.filter(d=>cat(d)==ct).map(d=>d[0]))];
+ const ps=[...new Set(D.filter(d=>cat(d)==ct&&(sc||d[8]>=FEAT)).map(d=>d[0]))];
  tabs.innerHTML=`<button class="${f=="all"?"on":""}" data-f="all">Todas</button>`+ps.map(k=>`<button class="${f==k?"on":""}" data-f="${k}">${P[k][0]}</button>`).join("");
 }
 function render(){
  const q=document.getElementById("q").value.toLowerCase();
  const l=D.map((d,i)=>[d,i]).filter(([d])=>(q||cat(d)==ct)&&(q||f=="all"||d[0]==f)&&(P[d[0]][0]+" "+d.join(" ")).toLowerCase().includes(q));
- document.getElementById("servicos").innerHTML=l.length?l.map(([d,i])=>card(d,i)).join(""):'<div class="empty">Nenhum serviço encontrado. Tente outro termo.</div>';
+ const hi=l.filter(([d])=>d[8]>=FEAT),lo=l.filter(([d])=>d[8]<FEAT);
+ let h=hi.map(([d,i])=>card(d,i)).join("");
+ if(lo.length){
+  const show=sc||q;
+  h+=`<div class="empty" style="grid-column:1/-1"><button class="btn o" id="baratos">${show&&!q?"Ocultar":"Ver"} serviços econômicos (${lo.length})</button><div style="font-size:13px;margin-top:6px">Pedido mínimo de R$ 5,00 nesses serviços</div></div>`;
+  if(show)h+=lo.map(([d,i])=>card(d,i)).join("");
+ }
+ document.getElementById("servicos").innerHTML=h||'<div class="empty">Nenhum serviço encontrado. Tente outro termo.</div>';
 }
-cats.onclick=e=>{const b=e.target.closest("button");if(!b)return;ct=b.dataset.c;f="all";ui();render()};
+cats.onclick=e=>{const b=e.target.closest("button");if(!b)return;ct=b.dataset.c;f="all";sc=false;ui();render()};
 tabs.onclick=e=>{const b=e.target.closest("button");if(!b)return;f=b.dataset.f;ui();render()};
 document.getElementById("q").oninput=render;
 ui();
 const dlg=document.getElementById("dlg"),qt=document.getElementById("qt");let cur=null;
 const num=v=>{const m=/^(\d+(?:[.,]\d+)?)([KMB]?)/i.exec(v||"");return m?parseFloat(m[1].replace(",","."))*({K:1e3,M:1e6,B:1e9}[m[2].toUpperCase()]||1):0};
 let mq=1;
-function minQ(d){ // menor quantidade (1, 2, 5, 10, 20, 50...) que chega a R$ 1,00, respeitando o mínimo do serviço
- const need=Math.ceil(1000/d[8]);
+function minQ(d){ // menor quantidade (1, 2, 5, 10, 20, 50...) que chega ao pedido mínimo (R$ 5,00 nos baratos, R$ 1,00 nos demais), respeitando o mínimo do serviço
+ const need=Math.ceil(1000*tg(d)/d[8]);
  for(let q=1;;q*=10)for(const k of [1,2,5])if(q*k>=need)return Math.max(q*k,num(d[5])||1);
 }
-function tot(){const q=+qt.value||0;document.getElementById("tot").textContent="Total: R$ "+brl(Math.max(1,cur[8]*q/1000))}
+function tot(){const q=+qt.value||0;document.getElementById("tot").textContent="Total: R$ "+brl(Math.max(tg(cur),cur[8]*q/1000))}
 function fix(){if((+qt.value||0)<mq)qt.value=mq;tot()}
-document.getElementById("servicos").onclick=e=>{const b=e.target.closest(".buy");if(!b)return;cur=D[b.dataset.i];
+document.getElementById("servicos").onclick=e=>{if(e.target.id=="baratos"){sc=!sc;ui();render();return}const b=e.target.closest(".buy");if(!b)return;cur=D[b.dataset.i];
  mq=minQ(cur);qt.min=mq;qt.value=Math.max(mq,Math.min(1000,num(cur[6])||1000));
  document.getElementById("dt").textContent=P[cur[0]][0]+" · "+cur[1];
- document.getElementById("rg").textContent=[cur[3],cur[4],"mínimo "+mq,cur[6]&&"máximo "+cur[6]].filter(x=>x).join(" · ");
+ document.getElementById("rg").textContent=[cur[3],cur[4],"mínimo "+mq,cur[6]&&"máximo "+cur[6],cur[8]<FEAT&&"pedido mínimo R$ 5,00"].filter(x=>x).join(" · ");
  document.getElementById("ok").textContent="";tot();dlg.showModal()};
 qt.oninput=tot;qt.onchange=fix;
 document.getElementById("cl").onclick=()=>dlg.close();
