@@ -13,7 +13,7 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 Inter,system-ui,sans-serif}
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:10px 16px;flex-wrap:wrap}
-.logo{font:26px Anton,Impact,sans-serif;letter-spacing:.5px}.logo b{color:var(--acc)}
+.logo{font:26px Anton,Impact,sans-serif;letter-spacing:.5px}.logo{display:block;line-height:0}.logo img{display:block;height:44px;width:auto;background:#fff;border-radius:10px;padding:2px 8px}
 nav{display:flex;gap:14px;margin-left:auto;font-size:14px;align-items:center;flex-wrap:wrap}
 nav a{color:var(--mut);text-decoration:none}
 .btn{border:0;border-radius:10px;padding:9px 16px;font:600 14px Inter,sans-serif;cursor:pointer;background:var(--acc);color:#fff}
@@ -53,7 +53,7 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #3bd0
 </head>
 <body>
 <header>
-<div class="logo">Ric<b>Serv</b></div>
+<a href="index.html" class="logo" aria-label="RicServ"><img src="logo-ricserv.png" alt="RicServ" width="118" height="44"></a>
 <nav><a href="#servicos">Serviços</a><a class="btn" href="https://wa.me/5511937413799" style="text-decoration:none;color:#fff">Falar no WhatsApp</a></nav>
 </header>
 <section class="hero">
