@@ -74,33 +74,33 @@ button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #3bd0
 <div style="display:flex;gap:8px;margin-top:14px"><button class="btn" id="go" style="flex:1">Fazer pedido</button><button class="btn o" id="cl">Fechar</button></div>
 <p id="ok" style="color:#17a34a;font-size:13px;margin:10px 0 0"></p>
 </dialog>
-<footer>© 2026 RicServ · <a href="privacidade.html" style="color:inherit">Política de Privacidade</a> · Suporte pelo WhatsApp</footer>
+<footer>© 2026 RicServ · <a href="privacidade.html" style="color:inherit">Política de Privacidade</a> · Suporte pelo WhatsApp · <span style="opacity:.6">v9</span></footer>
 <script>
 const P={g:["Google","🔎","#4285f4,#34a853","#4285f4"],ig:["Instagram","📸","#f9ce34,#ee2a7b,#6228d7","#ee2a7b"],tt:["TikTok","🎵","#25f4ee,#fe2c55","#25f4ee"],yt:["YouTube","▶️","#ff0000,#ff6a00","#ff2a2a"],kw:["Kwai","🎬","#ff7a00,#ffb300","#ff8a00"],fb:["Facebook","👍","#1877f2,#00c6ff","#2d8cff"],tg:["Telegram","✈️","#2aabee,#229ed9","#2aabee"],wa:["WhatsApp","💬","#25d366,#128c7e","#25d366"],tw:["Twitch","🎮","#9146ff,#6a1bff","#a970ff"],ki:["Kick","🟢","#53fc18,#0b8f2b","#53fc18"],sp:["Spotify","🎧","#1db954,#0a7a35","#1ed760"],x:["X","✖️","#888,#ddd","#cfd4ff"],sh:["Shopee","🛍️","#ee4d2d,#ff9a3c","#ff6a3c"]};
 // plataforma, produto, origem, qualidade, reposição, velocidade, máximo, início, preço por 1.000
 const RP={SR:"Sem Reposição",R30:"Reposição 30 dias",R365:"Reposição 365 dias",V:"Reposição vitalícia",D15:"Duração 15 min"};
 const D=[];
-`ig|Visualizações Reels|Sem Quedas|SR|300-500K/dia|100|217M|0-15 min|0.0046
+`ig|Visualizações Reels|Estável|SR|300-500K/dia|100|217M|0-15 min|0.0046
 ig|Visualizações Reel Rápido|HQ|SR|200-500K/dia|100|2B|0-30 min|0.009
 x|Visualizações de Vídeo|Envio rápido|SR|50-100K/hora|100|100M|1 min|0.022
-tt|Salvamentos|Sem Quedas|SR|300K/dia|100|2B|0-5 min|0.036
+tt|Salvamentos|Estável|SR|300K/dia|100|2B|0-5 min|0.036
 ig|Visualizações Emergencial|HQ|SR|100-200K/dia|100|2B|0-30 min|0.04
 wa|Reações em Canal|Mix de emojis|SR|1-20K/dia|10|20K|0-10 min|0.139
 fb|Visualizações Vídeo e Reels|HQ|R30|8-20K/dia|500|100M||0.23
 tt|Curtidas em Live|Instantâneo|SR|500K/dia|50|2B|Instantâneo|0.24
 tg|Visualizações Últimos 5 Posts||SR||10|10M||0.26
-ig|Visualizações + Alcance|Sem Quedas|SR|300-500K/dia|10|5M|0-15 min|0.29
+ig|Visualizações + Alcance|Estável|SR|300-500K/dia|10|5M|0-15 min|0.29
 ig|Visitas ao Perfil||SR|5M/dia|10|1M|0-10 min|0.308
 tt|Visualizações|HQ|R30|100M/dia|100|2B|Imediato|0.32
 ig|Visualizações do Story||SR|20-40K/dia|100|20K|0-10 min|0.49
-ig|Curtidas Perfis com Foto|Sem Queda|SR|500K/dia|10|1M|0-10 min|0.53
+ig|Curtidas Perfis com Foto|Estável|SR|500K/dia|10|1M|0-10 min|0.53
 ig|Curtidas Mundiais|Contas Antigas|SR|50K/dia|10|5M|Imediato|0.566
 fb|Reações Mundiais|7 emojis|SR|100K/dia|10|10M|Imediato|0.61
-ig|Curtidas Mundiais|Sem Quedas|R365|40-50K/dia|20|100K|0-15 min|0.74
+ig|Curtidas Mundiais|Estável|R365|40-50K/dia|20|100K|0-15 min|0.74
 yt|Live Espectadores (15 min)|Instantâneo|D15|Instantâneo|10|600K|5-10 min|0.74
 ig|Salvamentos|Entrega 100%|SR||10|1M|0-30 min|0.745
-fb|Seguidores Perfil|Baixa queda|SR|300K/dia|10|1M|Imediato|0.75
-ig|Curtidas Mundiais HQ|Queda 1-2%|R30|50-100K/dia|100|1M|5-15 min|0.76
+fb|Seguidores Perfil|Estável|SR|300K/dia|10|1M|Imediato|0.75
+ig|Curtidas Mundiais HQ|Estável|R30|50-100K/dia|100|1M|5-15 min|0.76
 ig|Compartilhamentos|Melhor custo|SR||10|100M|0-1 h|0.79
 ig|Curtidas Mundiais HQ|Estável|SR|50-100K/dia|10|5M|0-30 min|0.943
 tw|Seguidores|Envio rápido|SR||20|5K||1.179
@@ -109,13 +109,13 @@ wa|Membros em Canal|HQ|SR|20K/dia|10|20K|0-10 min|1.39
 ig|Compartilhamentos Reels/Post|Rápido|SR|15-20K/dia|100|5M|10-30 min|1.47
 fb|Compartilhamentos|Post, foto, vídeo|V|100K/dia|100|217M|Imediato|1.49
 yt|Visualizações Econômico|Início rápido|SR|50-100K/dia|100|1M|Rápido|1.69
-fb|Membros p/ Grupo|Baixa queda|SR|100K/dia|10|100K|Imediato|1.76
+fb|Membros p/ Grupo|Estável|SR|100K/dia|10|100K|Imediato|1.76
 ki|Seguidores Mundiais|HQ|SR|10K/dia|1|100K|Instantâneo|1.90
 ig|Repostagens|Rápido|SR|100-200K/dia|1|10M|0-5 min|2.00
 tt|Live Espectadores (15 min)|Novo|D15|Gradual|100|50K|0-5 min|2.21
 ki|Seguidores Mundiais|HQ|R30|10K/dia|1|100K|Instantâneo|2.43
 kw|Visualizações Brasileiras|HQ|SR||100|100M|6-24 h|2.52
-tg|Membros|Sem quedas|R30||100|10K|0-6 h|2.659
+tg|Membros|Estável|R30||100|10K|0-6 h|2.659
 ig|Comentários Mundiais|Contas Reais|SR|50-100K/dia|10|1M|0-10 min|2.80
 fb|Seguidores Página e Perfil|HQ|SR|50K/dia|10|5M|Imediato|3.237
 yt|Live 100% Concorrente (15 min)|Início instantâneo|D15|Instantâneo|100|1M|Imediato|3.27
@@ -126,15 +126,15 @@ tt|Repost|HQ|SR|5K/dia|50|1M|0-5 min|4.14
 yt|Visualizações ADS|Anúncios nativos|V||100|1B||4.71
 kw|Seguidores Mundiais|HQ Premium|R30|50-100K/dia|1|600K|0-30 min|4.722
 kw|Seguidores Brasileiros|HQ Premium|R30|50-100K/dia|1|1M|0-30 min|5.52
-ig|Seguidores Mundiais|Queda 30-50%|SR|10-15K/dia|50|100K|0-30 min|5.66
-ig|Curtidas Brasileiras|Sem Quedas|SR|5-10K/dia|20|7K|0-15 min|5.93
+ig|Seguidores Mundiais|Econômico|SR|10-15K/dia|50|100K|0-30 min|5.66
+ig|Curtidas Brasileiras|Estável|SR|5-10K/dia|20|7K|0-15 min|5.93
 kw|Live Espectadores (15 min)|R30|D15|Rápido|50|10K|0-15 min|8.242
 tt|Curtidas Brasileiras|100% BR|SR|200-300/dia|10|10M|0-60 min|8.36
 ig|Seguidores Mundiais|Contas Reais 2024-25|SR|10-20K/dia|10|1M|0-15 min|8.72
 ig|Curtidas Orgânicas BR|Contas Reais|R30||10|6K|0-10 min|9.721
-sh|Live Espectadores (15 min)|Sem Quedas|D15|Instantâneo|10|100K|0-5 min|10.06
-ig|Seguidores Mundiais|Contas Antigas, queda 5-15%|SR|20-30K/dia|10|1M|5-30 min|10.26
-ig|Seguidores Mundiais|HQ, queda 15-30%|SR|2-5K/dia|10|10K|0-30 min|11.40
+sh|Live Espectadores (15 min)|Estável|D15|Instantâneo|10|100K|0-5 min|10.06
+ig|Seguidores Mundiais|Contas Antigas|SR|20-30K/dia|10|1M|5-30 min|10.26
+ig|Seguidores Mundiais|HQ|SR|2-5K/dia|10|10K|0-30 min|11.40
 tt|Seguidores Mundiais|HQ|SR||10|50K|0-15 min|14.79
 ig|Seguidores Mundiais Super Rápido|Estável|SR||10|10M|0-5 min|19.467
 tt|Seguidores Brasileiros|100% BR|R30|5K/dia|10|10K|0-5 min|27.41
@@ -151,7 +151,7 @@ D.forEach(d=>d[8]=Math.max(MIN,Math.round(d[8]*MULT*100)/100));
 const brl=n=>n.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
 function card(d,i){
  const p=P[d[0]],no=d[3].startsWith("Sem");
- const ch=[["🛡️",d[2]],[no?"🚫":d[3].startsWith("Dur")?"⏳":"♻️",d[3]],["🚀",d[4]],["📦","Mín: "+minQ(d)],["👑",d[6]&&"Máx: "+d[6]],["⏱️",d[7]&&"Início: "+d[7]]].filter(c=>c[1]);
+ const ch=[["🛡️",d[2]],[d[3].startsWith("Dur")?"⏳":"♻️",no?"":d[3]],["🚀",d[4]],["📦","Mín: "+minQ(d)],["👑",d[6]&&"Máx: "+d[6]],["⏱️",d[7]&&"Início: "+d[7]]].filter(c=>c[1]);
  return `<article class="bn" style="--g1:${p[3]};--gr:${p[2]}"><div class="top"><div class="ico">${p[1]}</div><div class="tt">${p[0]}<span>${d[1]}</span></div></div>
  <div class="ch">${ch.map((c,j)=>`<div class="c" style="--k:${K[j%6]}"><i>${c[0]}</i>${c[1]}</div>`).join("")}</div>
  <div class="price"><div class="pr"><small>R$</small>${brl(d[8])}</div><div class="unit">por 1.000<br>unidades</div></div>
@@ -206,7 +206,7 @@ function fix(){if((+qt.value||0)<mq)qt.value=mq;tot()}
 document.getElementById("servicos").onclick=e=>{if(e.target.id=="limpar"){qi.value="";render();return}if(e.target.id=="baratos"){sc=!sc;ui();render();return}const b=e.target.closest(".buy");if(!b)return;cur=D[b.dataset.i];
  mq=minQ(cur);qt.min=mq;qt.value=Math.max(mq,Math.min(1000,num(cur[6])||1000));
  document.getElementById("dt").textContent=P[cur[0]][0]+" · "+cur[1];
- document.getElementById("rg").textContent=[cur[3],cur[4],"mínimo "+mq,cur[6]&&"máximo "+cur[6],cur[8]<FEAT&&"pedido mínimo R$ 5,00"].filter(x=>x).join(" · ");
+ document.getElementById("rg").textContent=[cur[3].startsWith("Sem")?"":cur[3],cur[4],"mínimo "+mq,cur[6]&&"máximo "+cur[6],cur[8]<FEAT&&"pedido mínimo R$ 5,00"].filter(x=>x).join(" · ");
  document.getElementById("ok").textContent="";tot();dlg.showModal()};
 qt.oninput=tot;qt.onchange=fix;
 document.getElementById("cl").onclick=()=>dlg.close();
