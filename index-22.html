@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RicServ – Serviços de engajamento</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600&display=swap">
+<style>
+:root{--bg:#f3f5fb;--fg:#0b1030;--mut:#5b6384;--card:#fff;--line:#dfe3f2;--acc:#ff2d55;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#050826;--fg:#eef1ff;--mut:#9aa3d6;--card:#0c1240;--line:#1c2670}}
+:root[data-theme="dark"]{--bg:#050826;--fg:#eef1ff;--mut:#9aa3d6;--card:#0c1240;--line:#1c2670}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 Inter,system-ui,sans-serif}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:12px;padding:10px 16px;flex-wrap:wrap}
+.logo{font:26px Anton,Impact,sans-serif;letter-spacing:.5px}.logo{display:block;line-height:0}.logo img{display:block;height:44px;width:auto;background:#fff;border-radius:10px;padding:2px 8px}
+nav{display:flex;gap:14px;margin-left:auto;font-size:14px;align-items:center;flex-wrap:wrap}
+nav a{color:var(--mut);text-decoration:none}
+.btn{border:0;border-radius:10px;padding:9px 16px;font:600 14px Inter,sans-serif;cursor:pointer;background:var(--acc);color:#fff}
+.btn.o{background:none;border:1px solid var(--line);color:var(--fg)}
+.hero{padding:34px 16px 10px;max-width:1100px;margin:auto}
+.hero h1{font:clamp(34px,7vw,64px)/1.02 Anton,Impact,sans-serif;margin:0 0 10px}
+.hero p{color:var(--mut);max-width:560px;margin:0}
+.bar{max-width:1100px;margin:18px auto 0;padding:0 16px;display:flex;gap:8px;flex-wrap:wrap}
+.bar input{flex:1 1 220px;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit}
+.tabs{max-width:1100px;margin:10px auto 0;padding:0 16px;display:flex;gap:6px;overflow-x:auto}
+.tabs button{white-space:nowrap;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:20px;padding:6px 14px;cursor:pointer;font:600 13px Inter,sans-serif}
+.tabs button.on{background:var(--acc);border-color:var(--acc);color:#fff}
+#servicos{scroll-margin-top:90px}
+.grid{max-width:1100px;margin:18px auto;padding:0 16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+.bn{position:relative;border-radius:18px;padding:14px;color:#fff;background:radial-gradient(circle at 85% 8%,#1b4fe0 0,#0a1a6e 38%,#040a30 100%);border:2px solid var(--g1);box-shadow:0 0 22px -4px var(--g1);overflow:hidden;font-family:Anton,Impact,sans-serif;display:flex;flex-direction:column;gap:10px}
+.bn:after{content:"";position:absolute;right:-60px;bottom:-60px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,#3bd0ff55,transparent 65%)}
+.top{display:flex;align-items:center;gap:12px}
+.ico{flex:none;width:68px;height:68px;border-radius:18px;display:grid;place-items:center;font-size:36px;background:linear-gradient(135deg,var(--gr));box-shadow:0 4px 14px #0008}
+.tt{font-size:30px;line-height:1;text-shadow:0 3px 0 #000a}
+.tt span{display:block;font-size:25px;color:#ffe21a}
+.ch{display:grid;grid-template-columns:1fr 1fr;gap:7px;z-index:1}
+.c{display:flex;align-items:center;gap:7px;border:2px solid var(--k);border-radius:12px;padding:6px 8px;background:#02061acc;font-size:15px;line-height:1.1;min-height:46px;box-shadow:0 0 10px -3px var(--k)}
+.c i{font-style:normal;font-size:20px}
+.price{z-index:1;display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.pr{background:linear-gradient(100deg,#d3101b,#ff2a2a);padding:2px 18px 2px 12px;border-radius:4px 22px 4px 22px;font-size:46px;line-height:1.1;color:#ffe21a;text-shadow:0 3px 0 #0007}
+.pr small{font-size:20px;color:#fff;margin-right:3px}
+.unit{font:600 12px Inter,sans-serif;color:#c9d3ff;text-align:right}
+.buy{margin:-4px 0 0;z-index:1;border:0;border-radius:12px;padding:11px;font:18px Anton,Impact,sans-serif;letter-spacing:.5px;background:#ffe21a;color:#0b1030;cursor:pointer}
+dialog{border:1px solid var(--line);border-radius:16px;background:var(--card);color:var(--fg);width:min(420px,92vw);padding:20px}
+dialog::backdrop{background:#000a}
+dialog label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
+dialog input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit}
+.tot{font:30px Anton,Impact,sans-serif;margin:14px 0 4px}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:24px 16px 40px}
+.empty{grid-column:1/-1;text-align:center;color:var(--mut);padding:40px 0}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #3bd0ff;outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+<a href="index.html" class="logo" aria-label="RicServ"><img src="logo-ricserv.png" alt="RicServ" width="118" height="44"></a>
+<nav><a href="#servicos">Serviços</a><a class="btn" href="https://wa.me/5511937413799" style="text-decoration:none;color:#fff">Falar no WhatsApp</a></nav>
+</header>
+<section class="hero">
+<h1>Escolha o serviço.<br>Veja o preço na hora.</h1>
+<p>Cada pacote mostra o que está incluso: origem, reposição, velocidade, limite e tempo de início. Preços por 1.000 unidades.</p>
+</section>
+<div class="bar"><input id="q" type="search" enterkeyhint="search" autocomplete="off" placeholder="Buscar serviço, ex.: seguidores, curtidas, live" aria-label="Buscar serviço"></div>
+<div class="tabs" id="cats" role="tablist"></div>
+<div class="tabs" id="tabs"></div>
+<main class="grid" id="servicos"></main>
+<dialog id="dlg">
+<h3 id="dt" style="margin:0;font:24px Anton,Impact,sans-serif"></h3>
+<label for="lk">Link do perfil ou da publicação</label><input id="lk" placeholder="https://">
+<label for="qt">Quantidade</label><input id="qt" type="number" value="1000" step="10">
+<div class="tot" id="tot"></div>
+<div style="font-size:12px;color:var(--mut)" id="rg"></div>
+<div style="display:flex;gap:8px;margin-top:14px"><button class="btn" id="go" style="flex:1">Fazer pedido</button><button class="btn o" id="cl">Fechar</button></div>
+<p id="ok" style="color:#17a34a;font-size:13px;margin:10px 0 0"></p>
+</dialog>
+<footer>© 2026 RicServ · <a href="privacidade.html" style="color:inherit">Política de Privacidade</a> · Suporte pelo WhatsApp</footer>
+<script>
+const P={g:["Google","🔎","#4285f4,#34a853","#4285f4"],ig:["Instagram","📸","#f9ce34,#ee2a7b,#6228d7","#ee2a7b"],tt:["TikTok","🎵","#25f4ee,#fe2c55","#25f4ee"],yt:["YouTube","▶️","#ff0000,#ff6a00","#ff2a2a"],kw:["Kwai","🎬","#ff7a00,#ffb300","#ff8a00"],fb:["Facebook","👍","#1877f2,#00c6ff","#2d8cff"],tg:["Telegram","✈️","#2aabee,#229ed9","#2aabee"],wa:["WhatsApp","💬","#25d366,#128c7e","#25d366"],tw:["Twitch","🎮","#9146ff,#6a1bff","#a970ff"],ki:["Kick","🟢","#53fc18,#0b8f2b","#53fc18"],sp:["Spotify","🎧","#1db954,#0a7a35","#1ed760"],x:["X","✖️","#888,#ddd","#cfd4ff"],sh:["Shopee","🛍️","#ee4d2d,#ff9a3c","#ff6a3c"]};
+// plataforma, produto, origem, qualidade, reposição, velocidade, máximo, início, preço por 1.000
+const RP={SR:"Sem Reposição",R30:"Reposição 30 dias",R365:"Reposição 365 dias",V:"Reposição vitalícia",D15:"Duração 15 min"};
+const D=[];
+`ig|Visualizações Reels|Sem Quedas|SR|300-500K/dia|100|217M|0-15 min|0.0046
+ig|Visualizações Reel Rápido|HQ|SR|200-500K/dia|100|2B|0-30 min|0.009
+x|Visualizações de Vídeo|Envio rápido|SR|50-100K/hora|100|100M|1 min|0.022
+tt|Salvamentos|Sem Quedas|SR|300K/dia|100|2B|0-5 min|0.036
+ig|Visualizações Emergencial|HQ|SR|100-200K/dia|100|2B|0-30 min|0.04
+wa|Reações em Canal|Mix de emojis|SR|1-20K/dia|10|20K|0-10 min|0.139
+fb|Visualizações Vídeo e Reels|HQ|R30|8-20K/dia|500|100M||0.23
+tt|Curtidas em Live|Instantâneo|SR|500K/dia|50|2B|Instantâneo|0.24
+tg|Visualizações Últimos 5 Posts||SR||10|10M||0.26
+ig|Visualizações + Alcance|Sem Quedas|SR|300-500K/dia|10|5M|0-15 min|0.29
+ig|Visitas ao Perfil||SR|5M/dia|10|1M|0-10 min|0.308
+tt|Visualizações|HQ|R30|100M/dia|100|2B|Imediato|0.32
+ig|Visualizações do Story||SR|20-40K/dia|100|20K|0-10 min|0.49
+ig|Curtidas Perfis com Foto|Sem Queda|SR|500K/dia|10|1M|0-10 min|0.53
+ig|Curtidas Mundiais|Contas Antigas|SR|50K/dia|10|5M|Imediato|0.566
+fb|Reações Mundiais|7 emojis|SR|100K/dia|10|10M|Imediato|0.61
+ig|Curtidas Mundiais|Sem Quedas|R365|40-50K/dia|20|100K|0-15 min|0.74
+yt|Live Espectadores (15 min)|Instantâneo|D15|Instantâneo|10|600K|5-10 min|0.74
+ig|Salvamentos|Entrega 100%|SR||10|1M|0-30 min|0.745
+fb|Seguidores Perfil|Baixa queda|SR|300K/dia|10|1M|Imediato|0.75
+ig|Curtidas Mundiais HQ|Queda 1-2%|R30|50-100K/dia|100|1M|5-15 min|0.76
+ig|Compartilhamentos|Melhor custo|SR||10|100M|0-1 h|0.79
+ig|Curtidas Mundiais HQ|Estável|SR|50-100K/dia|10|5M|0-30 min|0.943
+tw|Seguidores|Envio rápido|SR||20|5K||1.179
+tw|Seguidores|Estável|R30||20|5K|0-30 min|1.223
+wa|Membros em Canal|HQ|SR|20K/dia|10|20K|0-10 min|1.39
+ig|Compartilhamentos Reels/Post|Rápido|SR|15-20K/dia|100|5M|10-30 min|1.47
+fb|Compartilhamentos|Post, foto, vídeo|V|100K/dia|100|217M|Imediato|1.49
+yt|Visualizações Econômico|Início rápido|SR|50-100K/dia|100|1M|Rápido|1.69
+fb|Membros p/ Grupo|Baixa queda|SR|100K/dia|10|100K|Imediato|1.76
+ki|Seguidores Mundiais|HQ|SR|10K/dia|1|100K|Instantâneo|1.90
+ig|Repostagens|Rápido|SR|100-200K/dia|1|10M|0-5 min|2.00
+tt|Live Espectadores (15 min)|Novo|D15|Gradual|100|50K|0-5 min|2.21
+ki|Seguidores Mundiais|HQ|R30|10K/dia|1|100K|Instantâneo|2.43
+kw|Visualizações Brasileiras|HQ|SR||100|100M|6-24 h|2.52
+tg|Membros|Sem quedas|R30||100|10K|0-6 h|2.659
+ig|Comentários Mundiais|Contas Reais|SR|50-100K/dia|10|1M|0-10 min|2.80
+fb|Seguidores Página e Perfil|HQ|SR|50K/dia|10|5M|Imediato|3.237
+yt|Live 100% Concorrente (15 min)|Início instantâneo|D15|Instantâneo|100|1M|Imediato|3.27
+tt|Curtidas Mundiais|Boa qualidade|R30||10|1M|0-30 min|3.353
+sp|Plays Mundiais|Garantia vitalícia|V|500-3,5K/dia|500|2B|Instantâneo|3.37
+fb|Live Espectadores (15 min)|Início instantâneo|D15|Instantâneo|20|50K|Imediato|3.53
+tt|Repost|HQ|SR|5K/dia|50|1M|0-5 min|4.14
+yt|Visualizações ADS|Anúncios nativos|V||100|1B||4.71
+kw|Seguidores Mundiais|HQ Premium|R30|50-100K/dia|1|600K|0-30 min|4.722
+kw|Seguidores Brasileiros|HQ Premium|R30|50-100K/dia|1|1M|0-30 min|5.52
+ig|Seguidores Mundiais|Queda 30-50%|SR|10-15K/dia|50|100K|0-30 min|5.66
+ig|Curtidas Brasileiras|Sem Quedas|SR|5-10K/dia|20|7K|0-15 min|5.93
+kw|Live Espectadores (15 min)|R30|D15|Rápido|50|10K|0-15 min|8.242
+tt|Curtidas Brasileiras|100% BR|SR|200-300/dia|10|10M|0-60 min|8.36
+ig|Seguidores Mundiais|Contas Reais 2024-25|SR|10-20K/dia|10|1M|0-15 min|8.72
+ig|Curtidas Orgânicas BR|Contas Reais|R30||10|6K|0-10 min|9.721
+sh|Live Espectadores (15 min)|Sem Quedas|D15|Instantâneo|10|100K|0-5 min|10.06
+ig|Seguidores Mundiais|Contas Antigas, queda 5-15%|SR|20-30K/dia|10|1M|5-30 min|10.26
+ig|Seguidores Mundiais|HQ, queda 15-30%|SR|2-5K/dia|10|10K|0-30 min|11.40
+tt|Seguidores Mundiais|HQ|SR||10|50K|0-15 min|14.79
+ig|Seguidores Mundiais Super Rápido|Estável|SR||10|10M|0-5 min|19.467
+tt|Seguidores Brasileiros|100% BR|R30|5K/dia|10|10K|0-5 min|27.41
+ig|Seguidores Brasileiros|HQ|SR|3-5K/dia|10|100K|0-30 min|33.34
+ig|Seguidores Brasileiros|HQ|R30|3-5K/dia|10|100K|0-30 min|45.47
+ig|Comentários Brasileiros|Personalizados|SR||1|50K|0-1 h|110.50
+yt|Inscritos Premium|Contas reais|R30|100/dia|50|10K||116.10`.split("\n").forEach(l=>{const f=l.split("|");D.push([f[0],f[1],f[2]||"",RP[f[3]]||f[3]||"",f[4]||"",f[5]||"",f[6]||"",f[7]||"",+f[8]])});
+D.sort((a,b)=>a[8]-b[8]); // do menor para o maior preço
+const K=["#27c7ff","#ffc21a","#ff3b6b","#ff5a3c","#3dff6e","#c44bff"];
+const MULT=1.5; // multiplicador de preço: altere aqui (2 = dobro do valor base)
+const WA="5511937413799"; // seu WhatsApp com DDI+DDD, ex.: "5511999999999"
+const MIN=1; // preço mínimo por 1.000 (R$)
+D.forEach(d=>d[8]=Math.max(MIN,Math.round(d[8]*MULT*100)/100));
+const brl=n=>n.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+function card(d,i){
+ const p=P[d[0]],no=d[3].startsWith("Sem");
+ const ch=[["🛡️",d[2]],[d[3].startsWith("Dur")?"⏳":"♻️",no?"":d[3]],["🚀",d[4]],["📦","Mín: "+minQ(d)],["👑",d[6]&&"Máx: "+d[6]],["⏱️",d[7]&&"Início: "+d[7]]].filter(c=>c[1]);
+ return `<article class="bn" style="--g1:${p[3]};--gr:${p[2]}"><div class="top"><div class="ico">${p[1]}</div><div class="tt">${p[0]}<span>${d[1]}</span></div></div>
+ <div class="ch">${ch.map((c,j)=>`<div class="c" style="--k:${K[j%6]}"><i>${c[0]}</i>${c[1]}</div>`).join("")}</div>
+ <div class="price"><div class="pr"><small>R$</small>${brl(d[8])}</div><div class="unit">por 1.000<br>unidades</div></div>
+ <button class="buy" data-i="${i}">COMPRAR AGORA</button></article>`;
+}
+let f="all",ct="Seguidores",sc=false;
+const FEAT=5; // serviços acima de R$ 5 por mil ficam em destaque; abaixo disso o pedido mínimo é R$ 5,00
+const tg=d=>d[8]<FEAT?5:1;
+const CT=["Seguidores","Curtidas","Visualizações","Comentários","Outros"];
+const cat=d=>/seguidor|membro|inscrito/i.test(d[1])?CT[0]:/curtida|reaç/i.test(d[1])?CT[1]:/coment/i.test(d[1])?CT[3]:/visualiza|live|plays|espectad/i.test(d[1])?CT[2]:CT[4];
+const cats=document.getElementById("cats"),tabs=document.getElementById("tabs");
+function ui(){
+ cats.innerHTML=CT.map(c=>`<button class="${c==ct?"on":""}" data-c="${c}">${c}</button>`).join("");
+ const ps=[...new Set(D.filter(d=>cat(d)==ct&&(sc||d[8]>=FEAT)).map(d=>d[0]))];
+ tabs.innerHTML=`<button class="${f=="all"?"on":""}" data-f="all">Todas</button>`+ps.map(k=>`<button class="${f==k?"on":""}" data-f="${k}">${P[k][0]}</button>`).join("");
+}
+const nz=t=>t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+function render(){
+ const q=document.getElementById("q").value.trim(),T=nz(q).split(/\s+/).filter(Boolean);
+ cats.style.display=tabs.style.display=T.length?"none":"";
+ const hay=d=>nz(P[d[0]][0]+" "+d.slice(1,8).join(" ")+" "+cat(d));
+ const l=D.map((d,i)=>[d,i]).filter(([d])=>T.length?T.every(t=>hay(d).includes(t)):cat(d)==ct&&(f=="all"||d[0]==f));
+ let h="";
+ if(T.length){
+  h=`<div class="empty" style="grid-column:1/-1;padding:0;text-align:left">${l.length} resultado${l.length==1?"":"s"} para “${q.replace(/[<>&]/g,"")}” · <button class="btn o" id="limpar" style="padding:4px 12px">Limpar busca</button></div>`+l.map(([d,i])=>card(d,i)).join("");
+  if(!l.length)h=h.replace(/<\/div>$/,'</div><div class="empty" style="grid-column:1/-1">Nenhum serviço encontrado. Tente outro termo, como seguidores, curtidas ou o nome da rede.</div>');
+ }else{
+  const hi=l.filter(([d])=>d[8]>=FEAT),lo=l.filter(([d])=>d[8]<FEAT);
+  h=hi.map(([d,i])=>card(d,i)).join("");
+  if(lo.length){
+   h+=`<div class="empty" style="grid-column:1/-1"><button class="btn o" id="baratos">${sc?"Ocultar":"Ver"} serviços econômicos (${lo.length})</button><div style="font-size:13px;margin-top:6px">Pedido mínimo de R$ 5,00 nesses serviços</div></div>`;
+   if(sc)h+=lo.map(([d,i])=>card(d,i)).join("");
+  }
+ }
+ document.getElementById("servicos").innerHTML=h||'<div class="empty">Nenhum serviço encontrado.</div>';
+}
+cats.onclick=e=>{const b=e.target.closest("button");if(!b)return;ct=b.dataset.c;f="all";sc=false;ui();render()};
+tabs.onclick=e=>{const b=e.target.closest("button");if(!b)return;f=b.dataset.f;ui();render()};
+const qi=document.getElementById("q");
+qi.oninput=qi.onsearch=qi.onkeyup=render;
+qi.onkeydown=e=>{if(e.key=="Enter"){e.preventDefault();qi.blur();document.getElementById("servicos").scrollIntoView({behavior:"smooth"})}};
+ui();
+const dlg=document.getElementById("dlg"),qt=document.getElementById("qt");let cur=null;
+const num=v=>{const m=/^(\d+(?:[.,]\d+)?)([KMB]?)/i.exec(v||"");return m?parseFloat(m[1].replace(",","."))*({K:1e3,M:1e6,B:1e9}[m[2].toUpperCase()]||1):0};
+let mq=1;
+function minQ(d){ // menor quantidade (1, 2, 5, 10, 20, 50...) que chega ao pedido mínimo (R$ 5,00 nos baratos, R$ 1,00 nos demais), respeitando o mínimo do serviço
+ const need=Math.ceil(1000*tg(d)/d[8]);
+ for(let q=1;;q*=10)for(const k of [1,2,5])if(q*k>=need)return Math.max(q*k,num(d[5])||1);
+}
+function tot(){const q=+qt.value||0;document.getElementById("tot").textContent="Total: R$ "+brl(Math.max(tg(cur),cur[8]*q/1000))}
+function fix(){if((+qt.value||0)<mq)qt.value=mq;tot()}
+document.getElementById("servicos").onclick=e=>{if(e.target.id=="limpar"){qi.value="";render();return}if(e.target.id=="baratos"){sc=!sc;ui();render();return}const b=e.target.closest(".buy");if(!b)return;cur=D[b.dataset.i];
+ mq=minQ(cur);qt.min=mq;qt.value=Math.max(mq,Math.min(1000,num(cur[6])||1000));
+ document.getElementById("dt").textContent=P[cur[0]][0]+" · "+cur[1];
+ document.getElementById("rg").textContent=[cur[3].startsWith("Sem")?"":cur[3],cur[4],"mínimo "+mq,cur[6]&&"máximo "+cur[6],cur[8]<FEAT&&"pedido mínimo R$ 5,00"].filter(x=>x).join(" · ");
+ document.getElementById("ok").textContent="";tot();dlg.showModal()};
+qt.oninput=tot;qt.onchange=fix;
+document.getElementById("cl").onclick=()=>dlg.close();
+document.getElementById("go").onclick=()=>{fix();const m=`Olá! Quero ${P[cur[0]][0]} ${cur[1]} (${cur[2]}), qtd ${qt.value}, link: ${document.getElementById("lk").value}. Total R$ ${brl(cur[8]*(+qt.value||0)/1000)}`;
+ if(WA){location.href="https://wa.me/"+WA+"?text="+encodeURIComponent(m)}else{document.getElementById("ok").textContent="Defina o número em WA no código para receber pedidos."}};
+render();
+</script>
+</body>
+</html>
