@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Enviar pedido – RicServ</title>
+<style>
+:root{--bg:#f3f5fb;--fg:#0b1030;--mut:#5b6384;--card:#fff;--line:#dfe3f2;--acc:#ff2d55;--ok:#17a34a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#050826;--fg:#eef1ff;--mut:#9aa3d6;--card:#0c1240;--line:#1c2670}}
+:root[data-theme="dark"]{--bg:#050826;--fg:#eef1ff;--mut:#9aa3d6;--card:#0c1240;--line:#1c2670}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+main{max-width:640px;margin:0 auto;padding:16px 16px 60px}
+h1{font-size:24px;margin:8px 0 4px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:14px}
+label{display:block;font-size:13px;color:var(--mut);margin:10px 0 4px}
+input,textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--fg);font:inherit}
+textarea{min-height:70px}
+button{border:0;border-radius:10px;padding:11px 16px;font:600 15px system-ui,sans-serif;cursor:pointer;background:var(--acc);color:#fff}
+button.o{background:none;border:1px solid var(--line);color:var(--fg)}
+button:disabled{opacity:.5}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.mut{color:var(--mut);font-size:13px}
+.svc{padding:10px;border:1px solid var(--line);border-radius:10px;margin-top:8px;cursor:pointer;background:var(--bg)}
+.svc.on{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc) inset}
+.svc b{display:block}
+#res{white-space:pre-wrap;word-break:break-word}
+.ok{color:var(--ok)}.err{color:var(--acc)}
+:focus-visible{outline:3px solid #3bd0ff;outline-offset:2px}
+</style>
+</head>
+<body>
+<main>
+<h1>Enviar pedido ao WasSMM</h1>
+<div class="mut">Página privada. Só use depois de confirmar o Pix do cliente.</div>
+
+<div class="box">
+<label for="tk">Senha de acesso (ADMIN_TOKEN)</label>
+<input id="tk" type="password" autocomplete="off">
+<div class="row"><button id="load">Entrar e carregar serviços</button><span class="mut" id="saldo"></span></div>
+</div>
+
+<div class="box">
+<label for="msg">Mensagem do cliente (opcional, cole aqui)</label>
+<textarea id="msg" placeholder="Olá! Quero Instagram Seguidores Mundiais (...), qtd 1000, link: https://..."></textarea>
+<div class="row"><button class="o" id="fill">Preencher com a mensagem</button></div>
+</div>
+
+<div class="box">
+<label for="q">Buscar serviço do WasSMM</label>
+<input id="q" type="search" placeholder="ex.: instagram seguidores" autocomplete="off">
+<div id="list"></div>
+<label for="link">Link do perfil ou da publicação</label>
+<input id="link" type="url" placeholder="https://">
+<label for="qty">Quantidade</label>
+<input id="qty" type="number" inputmode="numeric" min="1">
+<div class="mut" id="info" style="margin-top:8px">Selecione um serviço.</div>
+<div class="row"><button id="send" disabled>Enviar pedido ao WasSMM</button></div>
+</div>
+
+<div class="box">
+<div id="res" class="mut">Resultado aparece aqui.</div>
+<label for="oid">Consultar status de um pedido</label>
+<input id="oid" type="number" inputmode="numeric" placeholder="Número do pedido">
+<div class="row"><button class="o" id="stat">Ver status</button></div>
+</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let S=[],sel=null,busy=false;
+const nz=t=>String(t).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+const brl=n=>n.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
+const say=(t,c)=>{const r=$("res");r.textContent=t;r.className=c||"mut"};
+async function api(body){
+  const r=await fetch("/api/wassmm",{method:"POST",headers:{"content-type":"application/json",authorization:"Bearer "+$("tk").value.trim()},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({error:"Resposta inválida"}));
+  if(!r.ok&&!j.error)j.error="Erro "+r.status;
+  return j;
+}
+try{$("tk").value=sessionStorage.getItem("tk")||""}catch(e){}
+$("load").onclick=async()=>{
+  try{sessionStorage.setItem("tk",$("tk").value.trim())}catch(e){}
+  say("Carregando…");
+  const [b,s]=await Promise.all([api({action:"balance"}),api({action:"services"})]);
+  if(s.error||!Array.isArray(s)){say("Erro: "+(s.error||"não foi possível listar os serviços"),"err");return}
+  S=s;$("saldo").textContent=b&&b.balance?"Saldo: "+b.balance+" "+(b.currency||""):"";
+  say(S.length+" serviços carregados.","ok");draw();
+};
+function draw(){
+  const T=nz($("q").value).split(/\s+/).filter(Boolean);
+  const l=S.filter(s=>T.every(t=>nz(s.name+" "+s.category).includes(t))).slice(0,30);
+  const box=$("list");box.textContent="";
+  if(!S.length){box.textContent="Carregue os serviços primeiro.";box.className="mut";return}
+  box.className="";
+  l.forEach(s=>{
+    const d=document.createElement("div");d.className="svc"+(sel&&sel.service==s.service?" on":"");
+    const b=document.createElement("b");b.textContent="#"+s.service+" · "+s.name;
+    const m=document.createElement("span");m.className="mut";
+    m.textContent=s.category+" · R$ "+brl(+s.rate)+" por mil · mín "+s.min+" · máx "+s.max;
+    d.append(b,m);d.onclick=()=>{sel=s;if(!$("qty").value)$("qty").value=s.min;draw();upd()};box.append(d);
+  });
+  if(!l.length)box.textContent="Nenhum serviço com esse termo.";
+}
+function upd(){
+  const q=+$("qty").value||0,ok=sel&&q>=+sel.min&&q<=+sel.max&&/^https:\/\//.test($("link").value.trim());
+  $("send").disabled=!ok||busy;
+  $("info").textContent=sel?("Custo estimado: R$ "+brl(+sel.rate*q/1000)+(q&&(q<+sel.min||q>+sel.max)?" · quantidade fora do limite ("+sel.min+" a "+sel.max+")":"")):"Selecione um serviço.";
+}
+["q"].forEach(i=>$(i).oninput=draw);
+["link","qty"].forEach(i=>$(i).oninput=upd);
+$("fill").onclick=()=>{
+  const m=$("msg").value,q=m.match(/qtd\s*(\d+)/i),l=m.match(/link:\s*(https?:\/\/\S+?)[.\s]*(?:Total|$)/i)||m.match(/https?:\/\/\S+/),n=m.match(/Quero\s+(.+?)(?:\s*\(|,)/i);
+  if(q)$("qty").value=q[1];if(l)$("link").value=(l[1]||l[0]).replace(/[.,]$/,"");if(n)$("q").value=n[1];
+  draw();upd();
+};
+$("send").onclick=async()=>{
+  if(busy||!sel)return;
+  const q=+$("qty").value,link=$("link").value.trim(),c=+sel.rate*q/1000;
+  if(!confirm("Enviar "+q+" de “"+sel.name+"” para\n"+link+"\nCusto ≈ R$ "+brl(c)+" ?"))return;
+  busy=true;$("send").disabled=true;say("Enviando…");
+  const r=await api({action:"add",service:sel.service,link,quantity:q});
+  busy=false;
+  if(r.order){say("Pedido criado ✅\nNúmero do pedido: "+r.order+"\nGuarde esse número para consultar o status.","ok");$("oid").value=r.order;$("link").value="";$("qty").value="";upd()}
+  else{say("Não foi enviado: "+(r.error||JSON.stringify(r)),"err");upd()}
+};
+$("stat").onclick=async()=>{
+  const o=$("oid").value.trim();if(!o)return;say("Consultando…");
+  const r=await api({action:"status",order:o});
+  say(r.error?"Erro: "+r.error:"Pedido "+o+"\nStatus: "+r.status+"\nIniciou em: "+r.start_count+"\nFaltam: "+r.remain+"\nCusto: "+r.charge+" "+(r.currency||""),r.error?"err":"ok");
+};
+</script>
+</body>
+</html>
